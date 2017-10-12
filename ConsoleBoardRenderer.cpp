@@ -30,10 +30,8 @@ void ConsoleBoardRenderer::drawTile(Tile *tile, int x, int y, int offSetX, int o
 		SetBkColor(dcTarget, RGB(0,0,0));
 
 		HPEN pen = CreatePen(PS_SOLID, 2, RGB(255,255,255));
-		HBRUSH brush = CreateSolidBrush(0x00FFFFFF);
 
 		SelectObject(dcTarget, pen);
-		SelectObject(dcTarget, brush);
 
 		::Rectangle(dcTarget, consolePosX, consolePosY, consolePosX + tileWidth, consolePosY + tileHeight);
 		DeleteObject(pen);
@@ -53,7 +51,7 @@ void ConsoleBoardRenderer::drawTile(Tile *tile, int x, int y, int offSetX, int o
 
 
 	RECT tileDimension = {consolePosX, consolePosY, consolePosX + tileWidth, consolePosY + tileHeight};
-	DrawText(dcTarget, tileChar, 1, &tileDimension, DT_BOTTOM);
+	DrawText(dcTarget, tileChar, 1, &tileDimension, DT_CENTER);
 }
 
 void ConsoleBoardRenderer::drawBackground(int offSetX, int offsetY)

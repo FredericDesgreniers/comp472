@@ -1,4 +1,6 @@
 #include <iostream>
+#include <unistd.h>
+#include <time.h>
 
 #include "Board.h"
 #include "BoardRenderer.h"
@@ -11,8 +13,14 @@ int main()
 	HWND consoleHandle = GetConsoleWindow();
 	HDC consoleDC = GetDC(consoleHandle);
 
+
 	BoardRenderer *boardRenderer = new ConsoleBoardRenderer(board, consoleDC);
 	boardRenderer->render(100, 100);
 
-	std::cin.get();
+	while(1)
+	{
+		sleep(1);
+		boardRenderer->render(100, 100);
+	}
+
 }
