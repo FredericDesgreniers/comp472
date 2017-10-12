@@ -1,7 +1,8 @@
 #include <iostream>
-#define _WIN32_WINNT 0x500
+
 #include "Board.h"
 #include "BoardRenderer.h"
+#include "ConsoleBoardRenderer.h"
 
 int main()
 {
@@ -10,8 +11,8 @@ int main()
 	HWND consoleHandle = GetConsoleWindow();
 	HDC consoleDC = GetDC(consoleHandle);
 
-	BoardRenderer boardRenderer(board, consoleDC);
-	boardRenderer.render(100, 100);
+	BoardRenderer *boardRenderer = new ConsoleBoardRenderer(board, consoleDC);
+	boardRenderer->render(100, 100);
 
 	std::cin.get();
 }
