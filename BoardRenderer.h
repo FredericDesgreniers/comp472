@@ -13,6 +13,11 @@ protected:
 	{
 
 	}
+
+	virtual void drawBackground(int offSetX, int offsetY)
+	{
+
+	}
 public:
 	BoardRenderer(Board board);
 
