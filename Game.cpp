@@ -1,5 +1,5 @@
 #include <windows.h>
-#include <tchar.h>
+
 #include "Board.h"
 #include "BoardRenderer.h"
 #include "WindowsBoardRenderer.h"
@@ -105,8 +105,8 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	if (!RegisterClass(&windowClass))
 	{
 		MessageBox(NULL,
-		           _T("Call to RegisterClassEx failed!"),
-		           _T("Game"),
+		           ("Call to RegisterClassEx failed!"),
+		           ("Game"),
 		           NULL);
 
 		return 1;
@@ -126,8 +126,8 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	{
 
 		MessageBox(NULL,
-		           _T("Call to CreateWindow failed! "),
-		           _T("Game"),
+		           ("Call to CreateWindow failed! "),
+		           ("Game"),
 		           NULL);
 
 		return 1;
@@ -146,4 +146,5 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
 	}
+	return 0;
 }

@@ -1,5 +1,4 @@
-#include <windef.h>
-#include <pbt.h>
+
 #include "BoardRenderer.h"
 
 BoardRenderer::BoardRenderer(DrawableBoard drawableBoard): drawableBoard(drawableBoard)

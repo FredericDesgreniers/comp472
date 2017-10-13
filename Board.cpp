@@ -4,6 +4,10 @@ Board::Board(int width, int height):width(width), height(height)
 {
 	int tileNum = width * height;
 	tiles = new Tile*[tileNum];
+	for(int i=0; i < tileNum; i++)
+	{
+		tiles[i] = nullptr;
+	}
 
 
 	for(int yIndex = 0; yIndex < height; yIndex++)

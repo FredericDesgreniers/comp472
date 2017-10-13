@@ -35,17 +35,17 @@ public:
 
 	virtual Tile* getTileAtDisplayCoordinates(int x, int y)
 	{
-
+		return nullptr;
 	}
 
 	virtual int getTilePosXFromDisplayCoordinates(int x)
 	{
-
+		return -1;
 	}
 
 	virtual int getTilePosYFromDisplayCoordinates(int y)
 	{
-
+		return -1;
 	}
 	DrawableBoard getDrawableBoard(){return drawableBoard;};
 };

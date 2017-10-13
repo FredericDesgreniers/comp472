@@ -1,7 +1,6 @@
 #pragma once
 #include "BoardRenderer.h"
-#include <Windows.h>
-#include <cwchar>
+#include <windows.h>
 
 class WindowsBoardRenderer: public BoardRenderer
 {
