@@ -1,8 +1,8 @@
 
 #include <iostream>
-#include "ConsoleBoardRenderer.h"
+#include "WindowsBoardRenderer.h"
 
-ConsoleBoardRenderer::ConsoleBoardRenderer(DrawableBoard drawableBoard, HWND handleTarget):BoardRenderer(drawableBoard), handleTarget(handleTarget)
+WindowsBoardRenderer::WindowsBoardRenderer(DrawableBoard drawableBoard, HWND handleTarget):BoardRenderer(drawableBoard), handleTarget(handleTarget)
 {
 	dcTarget = GetDC(handleTarget);
 
@@ -10,14 +10,14 @@ ConsoleBoardRenderer::ConsoleBoardRenderer(DrawableBoard drawableBoard, HWND han
 
 }
 
-void ConsoleBoardRenderer::drawTile(Tile *tile, int x, int y)
+void WindowsBoardRenderer::drawTile(Tile *tile, int x, int y)
 {
 	SelectObject( dcBufferTarget, font );
 
 	//TODO remove magic numbers
 	// +1 is because of the red border
-	int consolePosX = x * drawableBoard.getTileWidth() + 1;
-	int consolePosY = y * drawableBoard.getTileHeight() + 1;
+	int tilePosX = x * drawableBoard.getTileWidth() + 1;
+	int tilePosY = y * drawableBoard.getTileHeight() + 1;
 
 	POINT pt;
 	GetCursorPos(&pt);
@@ -27,10 +27,10 @@ void ConsoleBoardRenderer::drawTile(Tile *tile, int x, int y)
 	int relativeMousePosY = pt.y - drawableBoard.getY();
 
 	bool isHovering = false;
-	if(relativeMousePosX > consolePosX &&
-			relativeMousePosX < consolePosX + drawableBoard.getTileWidth()
-			&& relativeMousePosY > consolePosY &&
-			relativeMousePosY < consolePosY + drawableBoard.getTileHeight())
+	if(relativeMousePosX > tilePosX &&
+			relativeMousePosX < tilePosX + drawableBoard.getTileWidth()
+			&& relativeMousePosY > tilePosY &&
+			relativeMousePosY < tilePosY + drawableBoard.getTileHeight())
 	{
 		isHovering = true;
 	}
@@ -62,12 +62,12 @@ void ConsoleBoardRenderer::drawTile(Tile *tile, int x, int y)
 
 	SelectObject(dcBufferTarget, brush);
 
-	::Rectangle(dcBufferTarget, consolePosX, consolePosY, consolePosX + drawableBoard.getTileWidth(), consolePosY + drawableBoard.getTileHeight());
+	::Rectangle(dcBufferTarget, tilePosX, tilePosY, tilePosX + drawableBoard.getTileWidth(), tilePosY + drawableBoard.getTileHeight());
 
 	DeleteObject(brush);
 
 
-	RECT tileDimension = {consolePosX, consolePosY, consolePosX + drawableBoard.getTileWidth(), consolePosY + drawableBoard.getTileHeight()};
+	RECT tileDimension = {tilePosX, tilePosY, tilePosX + drawableBoard.getTileWidth(), tilePosY + drawableBoard.getTileHeight()};
 
 
 	SetBkMode(dcBufferTarget, TRANSPARENT);
@@ -77,7 +77,7 @@ void ConsoleBoardRenderer::drawTile(Tile *tile, int x, int y)
 	DrawText(dcBufferTarget, tileChar, 1, &tileDimension, DT_CENTER);
 }
 
-char *ConsoleBoardRenderer::getRenderChar(Tile *tile)
+char *WindowsBoardRenderer::getRenderChar(Tile *tile)
 {
 	char *tileChar = "a";
 	if(tile->getIsEmpty())
@@ -92,7 +92,7 @@ char *ConsoleBoardRenderer::getRenderChar(Tile *tile)
 	return tileChar;
 }
 
-void ConsoleBoardRenderer::drawBackground()
+void WindowsBoardRenderer::drawBackground()
 {
 	int startX = 0;
 	int startY = 0;
@@ -111,7 +111,7 @@ void ConsoleBoardRenderer::drawBackground()
 	DeleteObject(pen);
 }
 
-Tile *ConsoleBoardRenderer::getTileAtDisplayCoordinates(int x, int y)
+Tile *WindowsBoardRenderer::getTileAtDisplayCoordinates(int x, int y)
 {
 	int tilePosX = getTilePosXFromDisplayCoordinates(x);
 	int tilePosY = getTilePosYFromDisplayCoordinates(y);
@@ -124,7 +124,7 @@ Tile *ConsoleBoardRenderer::getTileAtDisplayCoordinates(int x, int y)
 	return nullptr;
 }
 
-int ConsoleBoardRenderer::getTilePosXFromDisplayCoordinates(int x)
+int WindowsBoardRenderer::getTilePosXFromDisplayCoordinates(int x)
 {
 	int relativeX = x - drawableBoard.getX();
 
@@ -138,7 +138,7 @@ int ConsoleBoardRenderer::getTilePosXFromDisplayCoordinates(int x)
 	return -1;
 }
 
-int ConsoleBoardRenderer::getTilePosYFromDisplayCoordinates(int y)
+int WindowsBoardRenderer::getTilePosYFromDisplayCoordinates(int y)
 {
 	int relativeY = y - drawableBoard.getY();
 
@@ -152,7 +152,7 @@ int ConsoleBoardRenderer::getTilePosYFromDisplayCoordinates(int y)
 	return -1;
 }
 
-void ConsoleBoardRenderer::renderStart()
+void WindowsBoardRenderer::renderStart()
 {
 	dcBufferTarget = CreateCompatibleDC(NULL);
 
@@ -161,7 +161,7 @@ void ConsoleBoardRenderer::renderStart()
 }
 
 
-void ConsoleBoardRenderer::renderEnd()
+void WindowsBoardRenderer::renderEnd()
 {
 	BitBlt(dcTarget, drawableBoard.getX(), drawableBoard.getY(), drawableBoard.getPixelWidth() + 2, drawableBoard.getPixelHeight() + 2, dcBufferTarget, 0, 0, SRCCOPY);
 

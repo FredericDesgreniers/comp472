@@ -3,7 +3,7 @@
 #include <Windows.h>
 #include <cwchar>
 
-class ConsoleBoardRenderer: public BoardRenderer
+class WindowsBoardRenderer: public BoardRenderer
 {
 	HWND handleTarget;
 	HDC dcTarget;
@@ -23,7 +23,7 @@ protected:
 	void renderEnd() override;
 
 public:
-	ConsoleBoardRenderer(DrawableBoard drawableBoard, HWND handleTarget);
+	WindowsBoardRenderer(DrawableBoard drawableBoard, HWND handleTarget);
 	Tile* getTileAtDisplayCoordinates(int x, int y) override;
 
 	int getTilePosXFromDisplayCoordinates(int x) override ;

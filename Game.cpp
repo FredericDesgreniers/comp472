@@ -2,7 +2,7 @@
 #include <tchar.h>
 #include "Board.h"
 #include "BoardRenderer.h"
-#include "ConsoleBoardRenderer.h"
+#include "WindowsBoardRenderer.h"
 #include <string>
 
 bool wasMousePressed = false;
@@ -138,7 +138,7 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
 	DrawableBoard drawableBoard(&board, 20, 20);
 
-	boardRenderer = new ConsoleBoardRenderer(drawableBoard, hWnd);
+	boardRenderer = new WindowsBoardRenderer(drawableBoard, hWnd);
 
 	MSG msg;
 	while (GetMessage(&msg, NULL, 0, 0))
