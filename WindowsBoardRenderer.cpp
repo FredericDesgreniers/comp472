@@ -70,7 +70,7 @@ void WindowsBoardRenderer::drawTile(Tile *tile, int x, int y)
 
 	char* tileChar = getRenderCharAndSetColor(tile);
 
-	DrawText(dcBufferTarget, tileChar, 1, &tileDimension, DT_CENTER);
+	DrawText(dcBufferTarget, tileChar, 1, &tileDimension, DT_SINGLELINE | DT_CENTER | DT_VCENTER);
 }
 
 char *WindowsBoardRenderer::getRenderCharAndSetColor(Tile *tile)
