@@ -1,5 +1,5 @@
 #include "Board.h"
-
+#include "TileType.h"
 Board::Board(int width, int height):width(width), height(height)
 {
 	int tileNum = width * height;
@@ -16,10 +16,15 @@ Board::Board(int width, int height):width(width), height(height)
 		{
 			if (xIndex == 0)
 			{
-				setTileAt(xIndex, yIndex, new Tile(xIndex, yIndex, false));
-			} else
+				setTileAt(xIndex, yIndex, new Tile(xIndex, yIndex, RED));
+			}
+			else if (xIndex == width-1)
 			{
-				setTileAt(xIndex, yIndex, new Tile(xIndex, yIndex, true));
+				setTileAt(xIndex, yIndex, new Tile(xIndex, yIndex, GREEN));
+			}
+			else
+			{
+				setTileAt(xIndex, yIndex, new Tile(xIndex, yIndex, EMPTY));
 			}
 		}
 	}

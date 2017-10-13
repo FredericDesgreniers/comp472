@@ -11,7 +11,7 @@ class WindowsBoardRenderer: public BoardRenderer
 	HBITMAP bmp;
 	HBITMAP bmpold;
 
-	char* getRenderChar(Tile *tile);
+	char* getRenderCharAndSetColor(Tile *tile);
 
 protected:
 	void drawTile(Tile *tile, int x, int y) override;

@@ -29,7 +29,7 @@ void onClick(BoardRenderer *boardRenderer, HWND targetHandle)
 		return;
 	}
 
-	if(!tile->getIsEmpty())
+	if(!(tile->getType() == EMPTY))
 	{
 		if(selectedTile != nullptr)
 		{

@@ -41,23 +41,19 @@ void WindowsBoardRenderer::drawTile(Tile *tile, int x, int y)
 	HBRUSH brush;
 	if(isHovering || tile->getIsSelected())
 	{
-		brush = CreateSolidBrush(RGB(100,100,100));
-		SetTextColor(dcBufferTarget, RGB(255, 255, 255));
+		brush = CreateSolidBrush(RGB(150,150,150));
 
 	}
 	else
 	if((xMod2 || yMod2) && !(xMod2 && yMod2))
 	{
 
-		brush = CreateSolidBrush(RGB(0,0,0));
-		SetTextColor(dcBufferTarget, RGB(255, 255, 255));
+		brush = CreateSolidBrush(RGB(50,50,50));
 
 	}
 	else
 	{
-		brush = CreateSolidBrush(RGB(255,255,255));
-		SetTextColor(dcBufferTarget, RGB(0, 0, 0));
-
+		brush = CreateSolidBrush(RGB(150,150,150));
 	}
 
 	SelectObject(dcBufferTarget, brush);
@@ -72,24 +68,35 @@ void WindowsBoardRenderer::drawTile(Tile *tile, int x, int y)
 
 	SetBkMode(dcBufferTarget, TRANSPARENT);
 
-	char* tileChar = getRenderChar(tile);
+	char* tileChar = getRenderCharAndSetColor(tile);
 
 	DrawText(dcBufferTarget, tileChar, 1, &tileDimension, DT_CENTER);
 }
 
-char *WindowsBoardRenderer::getRenderChar(Tile *tile)
+char *WindowsBoardRenderer::getRenderCharAndSetColor(Tile *tile)
 {
-	char *tileChar = "a";
-	if(tile->getIsEmpty())
+	switch(tile->getType())
 	{
+		case EMPTY:
+		{
+			return " ";
+		};
+		case RED:
+		{
+			SetTextColor(dcBufferTarget, RGB(255, 0, 0));
+			return "R";
+		};
+		case GREEN:
+		{
+			SetTextColor(dcBufferTarget, RGB(0, 255, 0));
+			return "G";
+		};
 
+		default:
+		{
+			return " ";
+		}
 	}
-	else
-	{
-		tileChar = "n";
-	}
-
-	return tileChar;
 }
 
 void WindowsBoardRenderer::drawBackground()
@@ -99,7 +106,7 @@ void WindowsBoardRenderer::drawBackground()
 	int endX = startX + drawableBoard.getBoard()->getWidth() * drawableBoard.getTileWidth() + 2;
 	int endY = startY + drawableBoard.getBoard()->getHeight() * drawableBoard.getTileHeight() + 2;
 
-	HPEN pen = CreatePen(PS_SOLID, 2, 0x000000FF);
+	HPEN pen = CreatePen(PS_SOLID, 2, RGB(0,0,0));
 
 	SelectObject(dcBufferTarget, pen);
 

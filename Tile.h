@@ -1,5 +1,7 @@
 #pragma once
 
+#include "TileType.h"
+
 class Tile
 {
 private:
@@ -7,14 +9,14 @@ private:
 	int y;
 	bool isSelected = false;
 
-	bool isEmpty = true;
+	TileType type;
 public:
-	Tile(int x, int y, bool isEmpty);
+	Tile(int x, int y, TileType type);
 
 	bool getIsSelected(){return isSelected;}
 	void setIsSelected(bool isSelected){this->isSelected = isSelected;}
 
-	bool getIsEmpty(){return isEmpty;}
+	TileType getType(){return type;}
 
 	int getX() const;
 
