@@ -9,8 +9,6 @@ class ConsoleBoardRenderer: public BoardRenderer
 	HDC dcTarget;
 	HFONT font;
 
-	bool isTileHovered(int x, int y);
-
 protected:
 	void drawTile(Tile *tile, int x, int y) override;
 
@@ -18,6 +16,9 @@ protected:
 
 public:
 	ConsoleBoardRenderer(DrawableBoard drawableBoard, HWND handleTarget);
+	Tile* getTileAtDisplayCoordinates(int x, int y) override;
+
+	HDC getTargetDC(){return dcTarget;};
 };
 
 

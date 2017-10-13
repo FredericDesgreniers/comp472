@@ -43,7 +43,7 @@ void ConsoleBoardRenderer::drawTile(Tile *tile, int x, int y)
 	bool yMod2 = y % 2;
 
 	HBRUSH brush;
-	if(hovered)
+	if(hovered || (tile != nullptr && tile->isSelected))
 	{
 		brush = CreateSolidBrush(RGB(100,100,100));
 		SetTextColor(dcTarget, RGB(255, 255, 255));
@@ -97,10 +97,21 @@ void ConsoleBoardRenderer::drawBackground()
 	DeleteObject(pen);
 }
 
-bool ConsoleBoardRenderer::isTileHovered(int x, int y)
+Tile *ConsoleBoardRenderer::getTileAtDisplayCoordinates(int x, int y)
 {
+	int relativeX = x - drawableBoard.getX();
+	int relativeY = y - drawableBoard.getY();
 
+	if(relativeX > 0 && relativeX < drawableBoard.getTileWidth() * drawableBoard.getBoard()->getWidth() &&
+			relativeY > 0 && relativeY < drawableBoard.getTileHeight() * drawableBoard.getBoard()->getHeight())
+	{
+		int tilePosX = relativeX / drawableBoard.getTileWidth();
+		int tilePosY = relativeY / drawableBoard.getTileHeight();
 
+		return drawableBoard.getBoard()->getTileAt(tilePosX, tilePosY);
+	}
 
+	return nullptr;
 }
+
 

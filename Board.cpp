@@ -9,6 +9,8 @@ Board::Board(int width, int height):width(width), height(height)
 	{
 		tiles[tileIndex] = nullptr;
 	}
+
+	tiles[0] = new Tile(0, 0);
 }
 
 Tile *Board::getTileAt(int posX, int posY)

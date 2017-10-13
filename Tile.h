@@ -9,6 +9,8 @@ private:
 public:
 	Tile(int x, int y);
 
+	bool isSelected = false;
+
 	int getX() const;
 
 	int getY() const;

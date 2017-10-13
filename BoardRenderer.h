@@ -16,10 +16,17 @@ protected:
 	{
 
 	}
+
+
 public:
 	BoardRenderer(DrawableBoard drawableBoard);
 
 	void render();
+
+	virtual Tile* getTileAtDisplayCoordinates(int x, int y)
+	{
+
+	}
 };
 
 
