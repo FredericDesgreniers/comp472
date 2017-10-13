@@ -18,11 +18,8 @@ public:
 
 	int getWidth() const;
 
-	void setWidth(int width);
-
 	int getHeight() const;
 
-	void setHeight(int height);
 
 };
 
