@@ -40,7 +40,6 @@ int main()
 
 	while(running)
 	{
-		Sleep(20);
 		if(isMousePressed()){
 			if(!wasMousePressed)
 			{

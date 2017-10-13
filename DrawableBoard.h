@@ -13,8 +13,8 @@ private:
 	int x;
 	int y;
 
-	int tileWidth = 30;
-	int tileHeight = 30;
+	int tileWidth = 60;
+	int tileHeight = 60;
 
 public:
 	DrawableBoard(Board *board, int x, int y);
