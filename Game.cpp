@@ -116,7 +116,7 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 			"Game test",
 			WS_OVERLAPPEDWINDOW,
 			CW_USEDEFAULT, CW_USEDEFAULT,
-			1000, 500,
+			600, 400,
 			NULL,
 			NULL,
 			hInstance,

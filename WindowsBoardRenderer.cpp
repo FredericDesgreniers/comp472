@@ -41,7 +41,7 @@ void WindowsBoardRenderer::drawTile(Tile *tile, int x, int y)
 	HBRUSH brush;
 	if(isHovering || tile->getIsSelected())
 	{
-		brush = CreateSolidBrush(RGB(150,150,150));
+		brush = CreateSolidBrush(RGB(100,100,100));
 
 	}
 	else
