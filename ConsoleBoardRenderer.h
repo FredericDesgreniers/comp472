@@ -11,6 +11,9 @@ class ConsoleBoardRenderer: public BoardRenderer
 	HFONT font;
 	HBITMAP bmp;
 	HBITMAP bmpold;
+
+	char* getRenderChar(Tile *tile);
+
 protected:
 	void drawTile(Tile *tile, int x, int y) override;
 

@@ -13,38 +13,33 @@ ConsoleBoardRenderer::ConsoleBoardRenderer(DrawableBoard drawableBoard, HWND han
 void ConsoleBoardRenderer::drawTile(Tile *tile, int x, int y)
 {
 	SelectObject( dcBufferTarget, font );
-	char *tileChar = "a";
-	if(tile == nullptr)
-	{
 
-	}
-	else
-	{
-		tileChar = "n";
-	}
-
-
+	//TODO remove magic numbers
+	// +1 is because of the red border
 	int consolePosX = x * drawableBoard.getTileWidth() + 1;
 	int consolePosY = y * drawableBoard.getTileHeight() + 1;
 
 	POINT pt;
 	GetCursorPos(&pt);
 	ScreenToClient(handleTarget, &pt);
-	//std::cout << pt.x << std::endl;
 
-	bool hovered = false;
-	if(pt.x > consolePosX && pt.x < consolePosX + drawableBoard.getTileWidth()
-			&& pt.y > consolePosY && pt.y < consolePosY + drawableBoard.getTileHeight())
+	int relativeMousePosX = pt.x - drawableBoard.getX();
+	int relativeMousePosY = pt.y - drawableBoard.getY();
+
+	bool isHovering = false;
+	if(relativeMousePosX > consolePosX && 
+			relativeMousePosX < consolePosX + drawableBoard.getTileWidth()
+			&& relativeMousePosY > consolePosY &&
+			relativeMousePosY < consolePosY + drawableBoard.getTileHeight())
 	{
-		//std::cout << pt.x << std::endl;
-		hovered = true;
+		isHovering = true;
 	}
 
 	bool xMod2 = x % 2;
 	bool yMod2 = y % 2;
 
 	HBRUSH brush;
-	if(hovered || (tile != nullptr && tile->isSelected))
+	if(isHovering || (tile != nullptr && tile->isSelected))
 	{
 		brush = CreateSolidBrush(RGB(100,100,100));
 		SetTextColor(dcBufferTarget, RGB(255, 255, 255));
@@ -76,7 +71,25 @@ void ConsoleBoardRenderer::drawTile(Tile *tile, int x, int y)
 
 
 	SetBkMode(dcBufferTarget, TRANSPARENT);
+
+	char* tileChar = getRenderChar(tile);
+
 	DrawText(dcBufferTarget, tileChar, 1, &tileDimension, DT_CENTER);
+}
+
+char *ConsoleBoardRenderer::getRenderChar(Tile *tile)
+{
+	char *tileChar = "a";
+	if(tile == nullptr)
+	{
+
+	}
+	else
+	{
+		tileChar = "n";
+	}
+
+	return tileChar;
 }
 
 void ConsoleBoardRenderer::drawBackground()
@@ -103,8 +116,8 @@ Tile *ConsoleBoardRenderer::getTileAtDisplayCoordinates(int x, int y)
 	int relativeX = x - drawableBoard.getX();
 	int relativeY = y - drawableBoard.getY();
 
-	if(relativeX > 0 && relativeX < drawableBoard.getTileWidth() * drawableBoard.getBoard()->getWidth() &&
-			relativeY > 0 && relativeY < drawableBoard.getTileHeight() * drawableBoard.getBoard()->getHeight())
+	if(relativeX > 0 && relativeX < drawableBoard.getPixelWidth() &&
+			relativeY > 0 && relativeY < drawableBoard.getPixelHeight())
 	{
 		int tilePosX = relativeX / drawableBoard.getTileWidth();
 		int tilePosY = relativeY / drawableBoard.getTileHeight();
@@ -119,14 +132,14 @@ void ConsoleBoardRenderer::renderStart()
 {
 	dcBufferTarget = CreateCompatibleDC(NULL);
 
-	bmp = CreateCompatibleBitmap( getTargetDC(), drawableBoard.getBoard()->getWidth()*drawableBoard.getTileWidth() + 2, drawableBoard.getBoard()->getHeight() * drawableBoard.getTileHeight() + 2);
+	bmp = CreateCompatibleBitmap( getTargetDC(), drawableBoard.getPixelWidth() + 2, drawableBoard.getPixelHeight() + 2);
 	bmpold = (HBITMAP)SelectObject(dcBufferTarget, bmp);
 }
 
 
 void ConsoleBoardRenderer::renderEnd()
 {
-	BitBlt(dcTarget, drawableBoard.getX(), drawableBoard.getY(), drawableBoard.getBoard()->getWidth()*drawableBoard.getTileWidth() + 2, drawableBoard.getBoard()->getHeight() * drawableBoard.getTileHeight() + 2, dcBufferTarget, 0, 0, SRCCOPY);
+	BitBlt(dcTarget, drawableBoard.getX(), drawableBoard.getY(), drawableBoard.getPixelWidth() + 2, drawableBoard.getPixelHeight() + 2, dcBufferTarget, 0, 0, SRCCOPY);
 
 	BoardRenderer::renderEnd();
 
@@ -134,6 +147,7 @@ void ConsoleBoardRenderer::renderEnd()
 	DeleteObject(bmp);
 	DeleteObject(dcBufferTarget);
 }
+
 
 
 

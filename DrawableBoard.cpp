@@ -51,3 +51,24 @@ void DrawableBoard::setTileHeight(int tileHeight)
 	DrawableBoard::tileHeight = tileHeight;
 }
 
+int DrawableBoard::getPixelPositionX()
+{
+	return x * tileWidth;
+}
+
+int DrawableBoard::getPixelPositionY()
+{
+	return y * tileWidth;
+}
+
+int DrawableBoard::getPixelWidth()
+{
+	return board->getWidth() * tileWidth;
+}
+
+int DrawableBoard::getPixelHeight()
+{
+	return board->getHeight() * tileHeight;
+}
+
+

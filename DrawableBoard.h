@@ -19,6 +19,12 @@ private:
 public:
 	DrawableBoard(Board *board, int x, int y);
 
+	int getPixelPositionX();
+	int getPixelPositionY();
+
+	int getPixelWidth();
+	int  getPixelHeight();
+
 	int getX() const;
 
 	void setX(int x);

@@ -52,6 +52,7 @@ int main()
 			wasMousePressed = false;
 		}
 		boardRenderer->render();
+		Sleep(20);
 	}
 
 }
