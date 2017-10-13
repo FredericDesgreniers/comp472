@@ -14,18 +14,31 @@ Board::Board(int width, int height):width(width), height(height)
 	{
 		for(int xIndex = 0; xIndex < width; xIndex++)
 		{
-			if (xIndex == 0)
+			if(yIndex < 2)
 			{
 				setTileAt(xIndex, yIndex, new Tile(xIndex, yIndex, RED));
 			}
-			else if (xIndex == width-1)
+			else if(yIndex > 2)
 			{
 				setTileAt(xIndex, yIndex, new Tile(xIndex, yIndex, GREEN));
 			}
 			else
 			{
-				setTileAt(xIndex, yIndex, new Tile(xIndex, yIndex, EMPTY));
+				if(xIndex <4)
+				{
+					setTileAt(xIndex, yIndex, new Tile(xIndex, yIndex, GREEN));
+				}
+				else if(xIndex > 4)
+				{
+					setTileAt(xIndex, yIndex, new Tile(xIndex, yIndex, RED));
+				}
+				else
+				{
+					setTileAt(xIndex, yIndex, new Tile(xIndex, yIndex, EMPTY));
+				}
+
 			}
+
 		}
 	}
 }
