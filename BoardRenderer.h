@@ -37,6 +37,17 @@ public:
 	{
 
 	}
+
+	virtual int getTilePosXFromDisplayCoordinates(int x)
+	{
+
+	}
+
+	virtual int getTilePosYFromDisplayCoordinates(int y)
+	{
+
+	}
+	DrawableBoard getDrawableBoard(){return drawableBoard;};
 };
 
 

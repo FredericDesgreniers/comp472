@@ -10,6 +10,13 @@ bool isMousePressed()
 	return (GetKeyState(VK_LBUTTON) & 0x100) !=  0;
 }
 
+Tile *selectedTile = nullptr;
+
+void doMove(Board *board, int sourceX, int sourceY, int destinationX, int destinationY)
+{
+
+}
+
 void onClick(BoardRenderer *boardRenderer, HWND targetHandle)
 {
 
@@ -19,9 +26,34 @@ void onClick(BoardRenderer *boardRenderer, HWND targetHandle)
 
 	Tile* tile = boardRenderer->getTileAtDisplayCoordinates(pt.x, pt.y);
 
-	if(tile != nullptr)
+	if(tile == nullptr)
 	{
-		tile->isSelected = true;
+		return;
+	}
+
+	if(!tile->getIsEmpty())
+	{
+		if(selectedTile != nullptr)
+		{
+			selectedTile->setIsSelected(false);
+		}
+
+		selectedTile = tile;
+		selectedTile->setIsSelected(true);
+	}
+	else if(selectedTile != nullptr)
+	{
+		int destinationTileX = boardRenderer->getTilePosXFromDisplayCoordinates(pt.x);
+		int destinationTileY = boardRenderer->getTilePosYFromDisplayCoordinates(pt.y);
+
+		if (destinationTileX >= 0 && destinationTileY >= 0)
+		{
+			doMove(boardRenderer->getDrawableBoard().getBoard(), selectedTile->getX(), selectedTile->getY(),
+			       destinationTileX, destinationTileY);
+
+			selectedTile->setIsSelected(false);
+			selectedTile = nullptr;
+		}
 	}
 }
 

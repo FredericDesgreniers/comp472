@@ -27,7 +27,7 @@ void ConsoleBoardRenderer::drawTile(Tile *tile, int x, int y)
 	int relativeMousePosY = pt.y - drawableBoard.getY();
 
 	bool isHovering = false;
-	if(relativeMousePosX > consolePosX && 
+	if(relativeMousePosX > consolePosX &&
 			relativeMousePosX < consolePosX + drawableBoard.getTileWidth()
 			&& relativeMousePosY > consolePosY &&
 			relativeMousePosY < consolePosY + drawableBoard.getTileHeight())
@@ -39,7 +39,7 @@ void ConsoleBoardRenderer::drawTile(Tile *tile, int x, int y)
 	bool yMod2 = y % 2;
 
 	HBRUSH brush;
-	if(isHovering || (tile != nullptr && tile->isSelected))
+	if(isHovering || tile->getIsSelected())
 	{
 		brush = CreateSolidBrush(RGB(100,100,100));
 		SetTextColor(dcBufferTarget, RGB(255, 255, 255));
@@ -80,7 +80,7 @@ void ConsoleBoardRenderer::drawTile(Tile *tile, int x, int y)
 char *ConsoleBoardRenderer::getRenderChar(Tile *tile)
 {
 	char *tileChar = "a";
-	if(tile == nullptr)
+	if(tile->getIsEmpty())
 	{
 
 	}
@@ -113,19 +113,43 @@ void ConsoleBoardRenderer::drawBackground()
 
 Tile *ConsoleBoardRenderer::getTileAtDisplayCoordinates(int x, int y)
 {
-	int relativeX = x - drawableBoard.getX();
-	int relativeY = y - drawableBoard.getY();
+	int tilePosX = getTilePosXFromDisplayCoordinates(x);
+	int tilePosY = getTilePosYFromDisplayCoordinates(y);
 
-	if(relativeX > 0 && relativeX < drawableBoard.getPixelWidth() &&
-			relativeY > 0 && relativeY < drawableBoard.getPixelHeight())
+	if(tilePosX >= 0 && tilePosY >= 0)
 	{
-		int tilePosX = relativeX / drawableBoard.getTileWidth();
-		int tilePosY = relativeY / drawableBoard.getTileHeight();
-
 		return drawableBoard.getBoard()->getTileAt(tilePosX, tilePosY);
 	}
 
 	return nullptr;
+}
+
+int ConsoleBoardRenderer::getTilePosXFromDisplayCoordinates(int x)
+{
+	int relativeX = x - drawableBoard.getX();
+
+	if(relativeX > 0 && relativeX < drawableBoard.getPixelWidth())
+	{
+		int tilePosX = relativeX / drawableBoard.getTileWidth();
+
+		return tilePosX;
+	}
+
+	return -1;
+}
+
+int ConsoleBoardRenderer::getTilePosYFromDisplayCoordinates(int y)
+{
+	int relativeY = y - drawableBoard.getY();
+
+	if(relativeY > 0 && relativeY < drawableBoard.getPixelHeight())
+	{
+		int tilePosY = relativeY / drawableBoard.getTileHeight();
+
+		return tilePosY;
+	}
+
+	return -1;
 }
 
 void ConsoleBoardRenderer::renderStart()
@@ -147,6 +171,7 @@ void ConsoleBoardRenderer::renderEnd()
 	DeleteObject(bmp);
 	DeleteObject(dcBufferTarget);
 }
+
 
 
 

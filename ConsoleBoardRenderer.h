@@ -26,6 +26,10 @@ public:
 	ConsoleBoardRenderer(DrawableBoard drawableBoard, HWND handleTarget);
 	Tile* getTileAtDisplayCoordinates(int x, int y) override;
 
+	int getTilePosXFromDisplayCoordinates(int x) override ;
+
+	int getTilePosYFromDisplayCoordinates(int y)override ;
+
 	HDC getTargetDC(){return dcTarget;};
 };
 

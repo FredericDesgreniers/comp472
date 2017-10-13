@@ -1,6 +1,6 @@
 #include "Tile.h"
 
-Tile::Tile(int x, int y): x(x), y(y)
+Tile::Tile(int x, int y, bool isEmpty): x(x), y(y), isEmpty(isEmpty)
 {
 
 }

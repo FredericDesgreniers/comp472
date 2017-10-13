@@ -14,6 +14,8 @@ public:
 
 	Tile* getTileAt(int posX, int posY);
 
+	void setTileAt(int posX, int posY, Tile* tile);
+
 	int getWidth() const;
 
 	void setWidth(int width);
@@ -21,7 +23,6 @@ public:
 	int getHeight() const;
 
 	void setHeight(int height);
-
 
 };
 
