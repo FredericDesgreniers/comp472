@@ -5,13 +5,14 @@
 ConsoleBoardRenderer::ConsoleBoardRenderer(DrawableBoard drawableBoard, HWND handleTarget):BoardRenderer(drawableBoard), handleTarget(handleTarget)
 {
 	dcTarget = GetDC(handleTarget);
+
 	font = CreateFont(30, 15, 0, 0, 500, false, false, false, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, "Arial");
 
 }
 
 void ConsoleBoardRenderer::drawTile(Tile *tile, int x, int y)
 {
-	SelectObject( dcTarget, font );
+	SelectObject( dcBufferTarget, font );
 	char *tileChar = "a";
 	if(tile == nullptr)
 	{
@@ -23,8 +24,8 @@ void ConsoleBoardRenderer::drawTile(Tile *tile, int x, int y)
 	}
 
 
-	int consolePosX = x * drawableBoard.getTileWidth() + drawableBoard.getX();
-	int consolePosY = y * drawableBoard.getTileHeight() + drawableBoard.getY();
+	int consolePosX = x * drawableBoard.getTileWidth() + 1;
+	int consolePosY = y * drawableBoard.getTileHeight() + 1;
 
 	POINT pt;
 	GetCursorPos(&pt);
@@ -46,7 +47,7 @@ void ConsoleBoardRenderer::drawTile(Tile *tile, int x, int y)
 	if(hovered || (tile != nullptr && tile->isSelected))
 	{
 		brush = CreateSolidBrush(RGB(100,100,100));
-		SetTextColor(dcTarget, RGB(255, 255, 255));
+		SetTextColor(dcBufferTarget, RGB(255, 255, 255));
 
 	}
 	else
@@ -54,19 +55,19 @@ void ConsoleBoardRenderer::drawTile(Tile *tile, int x, int y)
 	{
 
 		brush = CreateSolidBrush(RGB(0,0,0));
-		SetTextColor(dcTarget, RGB(255, 255, 255));
+		SetTextColor(dcBufferTarget, RGB(255, 255, 255));
 
 	}
 	else
 	{
 		brush = CreateSolidBrush(RGB(255,255,255));
-		SetTextColor(dcTarget, RGB(0, 0, 0));
+		SetTextColor(dcBufferTarget, RGB(0, 0, 0));
 
 	}
 
-	SelectObject(dcTarget, brush);
+	SelectObject(dcBufferTarget, brush);
 
-	::Rectangle(dcTarget, consolePosX, consolePosY, consolePosX + drawableBoard.getTileWidth(), consolePosY + drawableBoard.getTileHeight());
+	::Rectangle(dcBufferTarget, consolePosX, consolePosY, consolePosX + drawableBoard.getTileWidth(), consolePosY + drawableBoard.getTileHeight());
 
 	DeleteObject(brush);
 
@@ -74,26 +75,26 @@ void ConsoleBoardRenderer::drawTile(Tile *tile, int x, int y)
 	RECT tileDimension = {consolePosX, consolePosY, consolePosX + drawableBoard.getTileWidth(), consolePosY + drawableBoard.getTileHeight()};
 
 
-	SetBkMode(dcTarget, TRANSPARENT);
-	DrawText(dcTarget, tileChar, 1, &tileDimension, DT_CENTER);
+	SetBkMode(dcBufferTarget, TRANSPARENT);
+	DrawText(dcBufferTarget, tileChar, 1, &tileDimension, DT_CENTER);
 }
 
 void ConsoleBoardRenderer::drawBackground()
 {
-	int startX = drawableBoard.getX()-1;
-	int startY = drawableBoard.getY()-1;
+	int startX = 0;
+	int startY = 0;
 	int endX = startX + drawableBoard.getBoard()->getWidth() * drawableBoard.getTileWidth() + 2;
 	int endY = startY + drawableBoard.getBoard()->getHeight() * drawableBoard.getTileHeight() + 2;
 
 	HPEN pen = CreatePen(PS_SOLID, 2, 0x000000FF);
 
-	SelectObject(dcTarget, pen);
+	SelectObject(dcBufferTarget, pen);
 
-	MoveToEx(dcTarget, startX, startY, (LPPOINT)NULL);
-	LineTo(dcTarget, startX, endY);
-	LineTo(dcTarget, endX, endY);
-	LineTo(dcTarget, endX, startY);
-	LineTo(dcTarget, startX, startY);
+	MoveToEx(dcBufferTarget, startX, startY, (LPPOINT)NULL);
+	LineTo(dcBufferTarget, startX, endY);
+	LineTo(dcBufferTarget, endX, endY);
+	LineTo(dcBufferTarget, endX, startY);
+	LineTo(dcBufferTarget, startX, startY);
 	DeleteObject(pen);
 }
 
@@ -113,5 +114,26 @@ Tile *ConsoleBoardRenderer::getTileAtDisplayCoordinates(int x, int y)
 
 	return nullptr;
 }
+
+void ConsoleBoardRenderer::renderStart()
+{
+	dcBufferTarget = CreateCompatibleDC(NULL);
+
+	bmp = CreateCompatibleBitmap( getTargetDC(), drawableBoard.getBoard()->getWidth()*drawableBoard.getTileWidth() + 2, drawableBoard.getBoard()->getHeight() * drawableBoard.getTileHeight() + 2);
+	bmpold = (HBITMAP)SelectObject(dcBufferTarget, bmp);
+}
+
+
+void ConsoleBoardRenderer::renderEnd()
+{
+	BitBlt(dcTarget, drawableBoard.getX(), drawableBoard.getY(), drawableBoard.getBoard()->getWidth()*drawableBoard.getTileWidth() + 2, drawableBoard.getBoard()->getHeight() * drawableBoard.getTileHeight() + 2, dcBufferTarget, 0, 0, SRCCOPY);
+
+	BoardRenderer::renderEnd();
+
+	SelectObject(dcBufferTarget, bmpold);
+	DeleteObject(bmp);
+	DeleteObject(dcBufferTarget);
+}
+
 
 

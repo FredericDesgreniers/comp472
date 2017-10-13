@@ -9,6 +9,8 @@ BoardRenderer::BoardRenderer(DrawableBoard drawableBoard): drawableBoard(drawabl
 
 void BoardRenderer::render()
 {
+	renderStart();
+
 	Board* boardToRender = drawableBoard.getBoard();
 
 	drawBackground();
@@ -20,6 +22,8 @@ void BoardRenderer::render()
 			drawTile(tileToDraw, xPos, yPos);
 		}
 	}
+
+	renderEnd();
 }
 
 

@@ -31,7 +31,7 @@ int main()
 
 	HWND consoleHandle = GetConsoleWindow();
 
-	DrawableBoard drawableBoard(&board, 100, 100);
+	DrawableBoard drawableBoard(&board, 20, 20);
 
 	BoardRenderer *boardRenderer = new ConsoleBoardRenderer(drawableBoard, consoleHandle);
 

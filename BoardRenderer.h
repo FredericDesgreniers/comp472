@@ -7,6 +7,16 @@ class BoardRenderer
 protected:
 	DrawableBoard drawableBoard;
 
+	virtual void renderStart()
+	{
+
+	}
+
+	virtual void renderEnd()
+	{
+
+	}
+
 	virtual void drawTile(Tile* tile, int x, int y)
 	{
 
