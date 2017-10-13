@@ -1,14 +1,12 @@
-#include <iostream>
+#include <windows.h>
+#include <tchar.h>
 #include "Board.h"
 #include "BoardRenderer.h"
 #include "ConsoleBoardRenderer.h"
+#include <string>
 
 bool wasMousePressed = false;
-
-bool isMousePressed()
-{
-	return (GetKeyState(VK_LBUTTON) & 0x100) !=  0;
-}
+BoardRenderer *boardRenderer;
 
 Tile *selectedTile = nullptr;
 
@@ -57,34 +55,95 @@ void onClick(BoardRenderer *boardRenderer, HWND targetHandle)
 	}
 }
 
-int main()
+LRESULT CALLBACK WndProc(HWND   hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	Board board(9,5);
-
-	HWND consoleHandle = GetConsoleWindow();
-
-	DrawableBoard drawableBoard(&board, 20, 20);
-
-	BoardRenderer *boardRenderer = new ConsoleBoardRenderer(drawableBoard, consoleHandle);
-
-
-	bool running = true;
-
-	while(running)
+	switch(uMsg)
 	{
-		if(isMousePressed()){
+		case WM_PAINT:
+		{
+			boardRenderer->render();
+		}break;
+
+		case WM_LBUTTONDOWN:
+		{
 			if(!wasMousePressed)
 			{
 				wasMousePressed = true;
-				onClick(boardRenderer, consoleHandle);
+				onClick(boardRenderer, hwnd);
 			}
-		}
-		else
+		}break;
+
+		case WM_LBUTTONUP:
 		{
 			wasMousePressed = false;
+		}break;
+
+		default:
+		{
+			return DefWindowProc(hwnd, uMsg, wParam, lParam);
 		}
-		boardRenderer->render();
-		Sleep(20);
+	}
+	return 0;
+}
+
+
+int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
+{
+	WNDCLASS windowClass = {};
+
+	windowClass.style          = CS_HREDRAW | CS_VREDRAW;
+	windowClass.lpfnWndProc    = WndProc;
+	windowClass.cbClsExtra     = 0;
+	windowClass.cbWndExtra     = 0;
+	windowClass.hInstance      = hInstance;
+	windowClass.hIcon          = NULL;
+	windowClass.hCursor        = LoadCursor(NULL, IDC_ARROW);
+	windowClass.hbrBackground  = (HBRUSH)(COLOR_WINDOW+1);
+	windowClass.lpszMenuName   = NULL;
+	windowClass.lpszClassName  = "game_test_123";
+
+	if (!RegisterClass(&windowClass))
+	{
+		MessageBox(NULL,
+		           _T("Call to RegisterClassEx failed!"),
+		           _T("Game"),
+		           NULL);
+
+		return 1;
+	}
+	HWND hWnd = CreateWindow(
+			windowClass.lpszClassName,
+			"Game test",
+			WS_OVERLAPPEDWINDOW,
+			CW_USEDEFAULT, CW_USEDEFAULT,
+			1000, 500,
+			NULL,
+			NULL,
+			hInstance,
+			NULL
+	);
+	if (!hWnd)
+	{
+
+		MessageBox(NULL,
+		           _T("Call to CreateWindow failed! "),
+		           _T("Game"),
+		           NULL);
+
+		return 1;
 	}
 
+	ShowWindow(hWnd, true);
+	Board board(9,5);
+
+	DrawableBoard drawableBoard(&board, 20, 20);
+
+	boardRenderer = new ConsoleBoardRenderer(drawableBoard, hWnd);
+
+	MSG msg;
+	while (GetMessage(&msg, NULL, 0, 0))
+	{
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
+	}
 }
