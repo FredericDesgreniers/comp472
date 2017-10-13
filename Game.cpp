@@ -64,6 +64,12 @@ LRESULT CALLBACK WndProc(HWND   hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			boardRenderer->render();
 		}break;
 
+		case WM_CLOSE:
+		case WM_DESTROY:
+		{
+			exit(0);
+		};
+
 		case WM_LBUTTONDOWN:
 		{
 			if(!wasMousePressed)
