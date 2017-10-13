@@ -5,16 +5,19 @@
 
 class ConsoleBoardRenderer: public BoardRenderer
 {
+	HWND handleTarget;
 	HDC dcTarget;
 	HFONT font;
 
-protected:
-	void drawTile(Tile *tile, int x, int y, int offSetX, int offSetY) override;
+	bool isTileHovered(int x, int y);
 
-	void drawBackground(int offSetX, int offsetY) override;
+protected:
+	void drawTile(Tile *tile, int x, int y) override;
+
+	void drawBackground() override;
 
 public:
-	ConsoleBoardRenderer(Board board, HDC dcTarget);
+	ConsoleBoardRenderer(DrawableBoard drawableBoard, HWND handleTarget);
 };
 
 

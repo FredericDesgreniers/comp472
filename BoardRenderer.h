@@ -1,27 +1,25 @@
 #pragma once
 #include "Board.h"
+#include "DrawableBoard.h"
 
 class BoardRenderer
 {
 protected:
-	Board board;
+	DrawableBoard drawableBoard;
 
-	int tileWidth = 20;
-	int tileHeight = 20;
-
-	virtual void drawTile(Tile* tile, int x, int y, int offSetX, int offSetY)
+	virtual void drawTile(Tile* tile, int x, int y)
 	{
 
 	}
 
-	virtual void drawBackground(int offSetX, int offsetY)
+	virtual void drawBackground()
 	{
 
 	}
 public:
-	BoardRenderer(Board board);
+	BoardRenderer(DrawableBoard drawableBoard);
 
-	void render(int offSetX, int offSetY);
+	void render();
 };
 
 

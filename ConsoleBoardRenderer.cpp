@@ -1,13 +1,15 @@
 
+#include <iostream>
 #include "ConsoleBoardRenderer.h"
 
-ConsoleBoardRenderer::ConsoleBoardRenderer(Board board, HDC dcTarget):BoardRenderer(board), dcTarget(dcTarget)
+ConsoleBoardRenderer::ConsoleBoardRenderer(DrawableBoard drawableBoard, HWND handleTarget):BoardRenderer(drawableBoard), handleTarget(handleTarget)
 {
+	dcTarget = GetDC(handleTarget);
 	font = CreateFont(20, 15, 0, 0, 500, false, false, false, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, "Arial");
 
 }
 
-void ConsoleBoardRenderer::drawTile(Tile *tile, int x, int y, int offSetX, int offSetY)
+void ConsoleBoardRenderer::drawTile(Tile *tile, int x, int y)
 {
 	SelectObject( dcTarget, font );
 	char *tileChar = "a";
@@ -21,45 +23,67 @@ void ConsoleBoardRenderer::drawTile(Tile *tile, int x, int y, int offSetX, int o
 	}
 
 
-	int consolePosX = x * tileWidth + offSetX;
-	int consolePosY = y * tileHeight + offSetY;
+	int consolePosX = x * drawableBoard.getTileWidth() + drawableBoard.getX();
+	int consolePosY = y * drawableBoard.getTileHeight() + drawableBoard.getY();
 
-	if(x % 2 ||  y % 2)
+	POINT pt;
+	GetCursorPos(&pt);
+	ScreenToClient(handleTarget, &pt);
+	//std::cout << pt.x << std::endl;
+
+	bool hovered = false;
+	if(pt.x > consolePosX && pt.x < consolePosX + drawableBoard.getTileWidth()
+			&& pt.y > consolePosY && pt.y < consolePosY + drawableBoard.getTileHeight())
 	{
-		SetTextColor(dcTarget, RGB(255,255,255));
-		SetBkColor(dcTarget, RGB(0,0,0));
+		//std::cout << pt.x << std::endl;
+		hovered = true;
+	}
 
-		HPEN pen = CreatePen(PS_SOLID, 2, RGB(255,255,255));
+	bool xMod2 = x % 2;
+	bool yMod2 = y % 2;
 
-		SelectObject(dcTarget, pen);
+	HBRUSH brush;
+	if(hovered)
+	{
+		brush = CreateSolidBrush(RGB(100,100,100));
+		SetTextColor(dcTarget, RGB(255, 255, 255));
 
-		::Rectangle(dcTarget, consolePosX, consolePosY, consolePosX + tileWidth, consolePosY + tileHeight);
-		DeleteObject(pen);
+	}
+	else
+	if((xMod2 || yMod2) && !(xMod2 && yMod2))
+	{
+
+		brush = CreateSolidBrush(RGB(0,0,0));
+		SetTextColor(dcTarget, RGB(255, 255, 255));
+
 	}
 	else
 	{
-		SetTextColor(dcTarget, RGB(0,0,0));
-		SetBkColor(dcTarget, RGB(255,255,255));
+		brush = CreateSolidBrush(RGB(255,255,255));
+		SetTextColor(dcTarget, RGB(0, 0, 0));
 
-		HPEN pen = CreatePen(PS_SOLID, 2, RGB(0,0,0));
-
-		SelectObject(dcTarget, pen);
-		::Rectangle(dcTarget, consolePosX, consolePosY, consolePosX + tileWidth, consolePosY + tileHeight);
-		DeleteObject(pen);
 	}
 
+	SelectObject(dcTarget, brush);
+
+	::Rectangle(dcTarget, consolePosX, consolePosY, consolePosX + drawableBoard.getTileWidth(), consolePosY + drawableBoard.getTileHeight());
+
+	DeleteObject(brush);
 
 
-	RECT tileDimension = {consolePosX, consolePosY, consolePosX + tileWidth, consolePosY + tileHeight};
+	RECT tileDimension = {consolePosX, consolePosY, consolePosX + drawableBoard.getTileWidth(), consolePosY + drawableBoard.getTileHeight()};
+
+
+	SetBkMode(dcTarget, TRANSPARENT);
 	DrawText(dcTarget, tileChar, 1, &tileDimension, DT_CENTER);
 }
 
-void ConsoleBoardRenderer::drawBackground(int offSetX, int offsetY)
+void ConsoleBoardRenderer::drawBackground()
 {
-	int startX = offSetX-1;
-	int startY = offsetY-1;
-	int endX = startX + board.getWidth() * tileWidth+2;
-	int endY = startY + board.getHeight() * tileHeight+2;
+	int startX = drawableBoard.getX()-1;
+	int startY = drawableBoard.getY()-1;
+	int endX = startX + drawableBoard.getBoard()->getWidth() * drawableBoard.getTileWidth() + 2;
+	int endY = startY + drawableBoard.getBoard()->getHeight() * drawableBoard.getTileHeight() + 2;
 
 	HPEN pen = CreatePen(PS_SOLID, 2, 0x000000FF);
 
@@ -71,5 +95,12 @@ void ConsoleBoardRenderer::drawBackground(int offSetX, int offsetY)
 	LineTo(dcTarget, endX, startY);
 	LineTo(dcTarget, startX, startY);
 	DeleteObject(pen);
+}
+
+bool ConsoleBoardRenderer::isTileHovered(int x, int y)
+{
+
+
+
 }
 

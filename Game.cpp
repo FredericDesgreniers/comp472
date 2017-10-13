@@ -11,16 +11,18 @@ int main()
 	Board board(9,5);
 
 	HWND consoleHandle = GetConsoleWindow();
-	HDC consoleDC = GetDC(consoleHandle);
+
+	DrawableBoard drawableBoard(&board, 100, 100);
+
+	BoardRenderer *boardRenderer = new ConsoleBoardRenderer(drawableBoard, consoleHandle);
 
 
-	BoardRenderer *boardRenderer = new ConsoleBoardRenderer(board, consoleDC);
-	boardRenderer->render(100, 100);
+	bool running = true;
 
-	while(1)
+	while(running)
 	{
-		sleep(1);
-		boardRenderer->render(100, 100);
+		Sleep(200);
+		boardRenderer->render();
 	}
 
 }
