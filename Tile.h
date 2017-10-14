@@ -8,10 +8,11 @@ private:
 	int x;
 	int y;
 	bool isSelected = false;
+	bool isBlack;
 
 	TileType type;
 public:
-	Tile(int x, int y, TileType type);
+	Tile(int x, int y, TileType type, bool isBlack);
 
 	bool getIsSelected(){return isSelected;}
 	void setIsSelected(bool isSelected){this->isSelected = isSelected;}
@@ -21,6 +22,8 @@ public:
 	int getX() const;
 
 	int getY() const;
+
+	bool getIsBlack() {return isBlack;}
 };
 
 

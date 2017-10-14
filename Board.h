@@ -9,6 +9,8 @@ private:
 	Tile** tiles;
 	int width;
 	int height;
+
+	bool shouldTileGenerateBlack(int x, int y);
 public:
 	Board(int width, int height);
 

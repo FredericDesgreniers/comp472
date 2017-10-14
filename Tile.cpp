@@ -1,6 +1,6 @@
 #include "Tile.h"
 
-Tile::Tile(int x, int y, TileType type): x(x), y(y), type(type)
+Tile::Tile(int x, int y, TileType type, bool isBlack): x(x), y(y), type(type), isBlack(isBlack)
 {
 
 }

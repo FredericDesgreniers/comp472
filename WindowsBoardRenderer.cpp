@@ -35,8 +35,7 @@ void WindowsBoardRenderer::drawTile(Tile *tile, int x, int y)
 		isHovering = true;
 	}
 
-	bool xMod2 = x % 2;
-	bool yMod2 = y % 2;
+
 
 	HBRUSH brush;
 	if(isHovering || tile->getIsSelected())
@@ -45,7 +44,7 @@ void WindowsBoardRenderer::drawTile(Tile *tile, int x, int y)
 
 	}
 	else
-	if((xMod2 || yMod2) && !(xMod2 && yMod2))
+	if(tile->getIsBlack())
 	{
 
 		brush = CreateSolidBrush(RGB(50,50,50));
