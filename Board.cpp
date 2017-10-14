@@ -55,14 +55,7 @@ bool Board::shouldTileGenerateBlack(int x, int y)
 	bool xMod2 = (x % 2) == 0;
 	bool yMod2 = (y % 2) == 0;
 
-	if((xMod2 && yMod2) || (!xMod2 && !yMod2))
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
+	return (xMod2 && yMod2) || !(xMod2 || yMod2);
 
 }
 
