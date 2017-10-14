@@ -10,7 +10,10 @@ private:
 	int width;
 	int height;
 
+	void generateTile(int x, int y);
+
 	bool shouldTileGenerateBlack(int x, int y);
+
 public:
 	Board(int width, int height);
 

@@ -47,7 +47,7 @@ void WindowsBoardRenderer::drawTile(Tile *tile, int x, int y)
 	if(tile->getIsBlack())
 	{
 
-		brush = CreateSolidBrush(RGB(50,50,50));
+		brush = CreateSolidBrush(RGB(0,0,0));
 
 	}
 	else
