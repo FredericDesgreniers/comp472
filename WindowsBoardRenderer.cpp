@@ -11,57 +11,93 @@ WindowsBoardRenderer::WindowsBoardRenderer(DrawableBoard *drawableBoard, HWND ha
 
 }
 
+void WindowsBoardRenderer::renderStart()
+{
+	dcBufferTarget = CreateCompatibleDC(NULL);
+
+	const vec2 boardDimensionIncludingBorder = drawableBoard->getPixelDimension() + (getDrawableBoard()
+			->getBorderWeight() * 2);
+
+	bmp = CreateCompatibleBitmap( getTargetDC(), boardDimensionIncludingBorder.width,
+	                              boardDimensionIncludingBorder.height);
+	bmpold = (HBITMAP)SelectObject(dcBufferTarget, bmp);
+}
+
 void WindowsBoardRenderer::drawTile(Tile *tile, const vec2 position)
 {
 	SelectObject( dcBufferTarget, font );
 
 	const vec2 tileDimension = drawableBoard->getTileDimension();
 
-	//TODO remove magic numbers
-	// +1 is because of the red border
-	const vec2 tilePosition = (position * tileDimension) + 1;
+	const vec2 tilePosition = (position * tileDimension) + drawableBoard->getBorderWeight(); // +1 is because of the red border
 
-	POINT pt;
-	GetCursorPos(&pt);
-	ScreenToClient(handleTarget, &pt);
+	//-- draw tile background --
 
-	bool isHovering = isCursorHovering(tilePosition, {pt.x, pt.y});
+	COLORREF tileBackgroundColor = getTileBackgroundColor(tile, isCursorHovering(tilePosition));
 
 
-	HBRUSH brush;
-	if(isHovering || tile->getIsSelected())
-	{
-		brush = CreateSolidBrush(RGB(100,100,100));
-
-	}
-	else
-	if(tile->getIsBlack())
-	{
-
-		brush = CreateSolidBrush(RGB(0,0,0));
-
-	}
-	else
-	{
-		brush = CreateSolidBrush(RGB(150,150,150));
-	}
-
+	HBRUSH brush = CreateSolidBrush(tileBackgroundColor);
 	SelectObject(dcBufferTarget, brush);
 
 	::Rectangle(dcBufferTarget, tilePosition.x, tilePosition.y, tilePosition.x + tileDimension.width, tilePosition.y + tileDimension.height);
 
 	DeleteObject(brush);
 
-
-	RECT tileDrawRect = {tilePosition.x, tilePosition.y, tilePosition.x + tileDimension.width, tilePosition.y +
+	//-- draw character --
+	RECT charDrawRect = {tilePosition.x, tilePosition.y, tilePosition.x + tileDimension.width, tilePosition.y +
 			tileDimension.height};
-
-
-	SetBkMode(dcBufferTarget, TRANSPARENT);
 
 	char* tileChar = getRenderCharAndSetColor(tile);
 
-	DrawText(dcBufferTarget, tileChar, 1, &tileDrawRect, DT_SINGLELINE | DT_CENTER | DT_VCENTER);
+	SetBkMode(dcBufferTarget, TRANSPARENT);
+	DrawText(dcBufferTarget, tileChar, 1, &charDrawRect, DT_SINGLELINE | DT_CENTER | DT_VCENTER);
+	SetBkMode(dcBufferTarget, OPAQUE);
+}
+
+bool WindowsBoardRenderer::isCursorHovering(const vec2 tilePosition)
+{
+	const vec2 relativeMousePosition = getCursorPosition() - drawableBoard->getPosition();
+
+	const vec2 &tileTopLeft = tilePosition;
+	const vec2 tileBottomRight = tilePosition + drawableBoard->getTileDimension();
+
+	bool isHovering = false;
+	if(relativeMousePosition.x > tileTopLeft.x &&
+	   relativeMousePosition.x < tileBottomRight.x
+	   && relativeMousePosition.y > tileTopLeft.y &&
+	   relativeMousePosition.y < tileBottomRight.y)
+	{
+		isHovering = true;
+	}
+	return isHovering;
+
+}
+
+const vec2 WindowsBoardRenderer::getCursorPosition()
+{
+	POINT cursorPosition;
+	GetCursorPos(&cursorPosition);
+	ScreenToClient(handleTarget, &cursorPosition);
+
+	return vec2{cursorPosition.x, cursorPosition.y};
+}
+
+COLORREF WindowsBoardRenderer::getTileBackgroundColor(Tile *tile, bool isHovering)
+{
+	if(isHovering || tile->getIsSelected())
+	{
+		return RGB(100,100,100);
+	}
+	else
+	if(tile->getIsBlack())
+	{
+		return RGB(0,0,0);
+	}
+	else
+	{
+		return RGB(150,150,150);
+	}
+
 }
 
 char *WindowsBoardRenderer::getRenderCharAndSetColor(Tile *tile)
@@ -139,17 +175,6 @@ const vec2 WindowsBoardRenderer::getTilePositionFromDisplayPosition(const vec2 p
 	return {-1, -1};
 }
 
-void WindowsBoardRenderer::renderStart()
-{
-	dcBufferTarget = CreateCompatibleDC(NULL);
-
-	vec2 boardPixelDimension = drawableBoard->getPixelDimension();
-
-	bmp = CreateCompatibleBitmap( getTargetDC(), boardPixelDimension.width + 2, boardPixelDimension.height + 2);
-	bmpold = (HBITMAP)SelectObject(dcBufferTarget, bmp);
-}
-
-
 void WindowsBoardRenderer::renderEnd()
 {
 	vec2 boardPosition = drawableBoard->getPosition();
@@ -163,27 +188,6 @@ void WindowsBoardRenderer::renderEnd()
 	SelectObject(dcBufferTarget, bmpold);
 	DeleteObject(bmp);
 	DeleteObject(dcBufferTarget);
-}
-
-bool WindowsBoardRenderer::isCursorHovering(const vec2 tilePosition, const vec2 cursorPosition)
-{
-	const vec2 tileDimension = drawableBoard->getTileDimension();
-	const vec2 boardPosition = drawableBoard->getPosition();
-	const vec2 relativeMousePosition = cursorPosition - boardPosition;
-
-	const vec2 tileTopLeft = tilePosition;
-	const vec2 tileBottomRight = tilePosition + tileDimension;
-
-	bool isHovering = false;
-	if(relativeMousePosition.x > tileTopLeft.x &&
-	   relativeMousePosition.x < tileBottomRight.x
-	   && relativeMousePosition.y > tileTopLeft.y &&
-	   relativeMousePosition.y < tileBottomRight.y)
-	{
-		isHovering = true;
-	}
-	return isHovering;
-
 }
 
 

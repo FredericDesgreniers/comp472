@@ -14,6 +14,8 @@ private:
 
 	vec2 tileDimension = {60,60};
 
+	int borderWeight = 1;
+
 public:
 	DrawableBoard(Board *board, vec2 position);
 
@@ -28,6 +30,8 @@ public:
 
 	const vec2 getTileDimension(){return tileDimension;}
 	void setTileDimension(vec2 tileDimension){this->tileDimension= tileDimension;};
+
+	const int getBorderWeight(){return borderWeight;};
 
 };
 
