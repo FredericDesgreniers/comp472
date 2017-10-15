@@ -24,8 +24,6 @@ void WindowsBoardRenderer::renderStart()
 
 void WindowsBoardRenderer::drawTile(Tile *tile, const vec2 position)
 {
-	SelectObject( dcBufferTarget, font );
-
 	const vec2 tilePosition = (position * drawableBoard->getTileDimension()) + drawableBoard->getBorderWeight();
 
 	drawTileBackground(tile, tilePosition);
@@ -103,6 +101,8 @@ void WindowsBoardRenderer::drawTileCharacter(const Tile *tile, const vec2 tilePo
 	                     tilePositionBottomRight.y};
 
 	const char* tileChar = getRenderCharAndSetColor(tile);
+
+	SelectObject( dcBufferTarget, font );
 
 	SetBkMode(dcBufferTarget, TRANSPARENT);
 	DrawText(dcBufferTarget, tileChar, 1, &tileCharRect, DT_SINGLELINE | DT_CENTER | DT_VCENTER);
