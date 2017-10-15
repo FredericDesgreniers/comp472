@@ -22,7 +22,9 @@ void onClick(BoardRenderer *boardRenderer, HWND targetHandle)
 	GetCursorPos(&pt);
 	ScreenToClient(targetHandle, &pt);
 
-	Tile* tile = boardRenderer->getTileAtDisplayCoordinates(vec2{pt.x, pt.y});
+	const vec2 cursorPosition = {pt.x, pt.y};
+
+	Tile* tile = boardRenderer->getTileAtDisplayCoordinates(cursorPosition);
 
 	if(tile == nullptr)
 	{
@@ -41,7 +43,7 @@ void onClick(BoardRenderer *boardRenderer, HWND targetHandle)
 	}
 	else if(selectedTile != nullptr)
 	{
-		const vec2 destinationTile = boardRenderer->getTilePositionFromDisplayPosition(vec2{pt.x, pt.y});
+		const vec2 destinationTile = boardRenderer->getTilePositionFromDisplayPosition(cursorPosition);
 
 		if (destinationTile.x >= 0 && destinationTile.y >= 0)
 		{
@@ -92,6 +94,26 @@ LRESULT CALLBACK WndProc(HWND   hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
+void iniGame(HWND windowHandle)
+{
+	const vec2 boardPosition = {20, 20};
+	const vec2 boardDimension = {9, 5};
+
+	Board board(boardDimension);
+	DrawableBoard drawableBoard(&board, boardPosition);
+
+	boardRenderer = new WindowsBoardRenderer(drawableBoard, windowHandle);
+}
+
+void runMessageLoop()
+{
+	MSG msg;
+	while (GetMessage(&msg, NULL, 0, 0))
+	{
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
+	}
+}
 
 int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
@@ -140,17 +162,10 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	}
 
 	ShowWindow(hWnd, true);
-	Board board({9, 5});
 
-	DrawableBoard drawableBoard(&board, {20, 20});
+	iniGame(hWnd);
 
-	boardRenderer = new WindowsBoardRenderer(drawableBoard, hWnd);
+	runMessageLoop();
 
-	MSG msg;
-	while (GetMessage(&msg, NULL, 0, 0))
-	{
-		TranslateMessage(&msg);
-		DispatchMessage(&msg);
-	}
 	return 0;
 }
