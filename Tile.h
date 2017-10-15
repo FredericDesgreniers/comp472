@@ -14,14 +14,14 @@ private:
 public:
 	Tile(vec2 position, TileType type, bool isBlack);
 
-	bool getIsSelected(){return isSelected;}
+	const bool getIsSelected() const {return isSelected;}
 	void setIsSelected(bool isSelected){this->isSelected = isSelected;}
 
-	TileType getType(){return type;}
+	const TileType getType() const {return type;} ;
 
-	vec2 getPosition(){return position;}
+	const vec2 getPosition() const {return position;}
 
-	bool getIsBlack() {return isBlack;}
+	const bool getIsBlack() const {return isBlack;}
 };
 
 

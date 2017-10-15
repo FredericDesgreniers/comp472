@@ -56,7 +56,7 @@ inline vec2 operator*(const vec2 &left, const int &right)
 	return vec2{left.x * right, left.y * right};
 }
 
-inline vec2 operator/(const vec2 &left, const int &right)
+inline vec2 operator/(const vec2 &left, int &right)
 {
 	return vec2{left.x / right, left.y / right};
 }

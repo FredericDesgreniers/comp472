@@ -27,31 +27,30 @@ void WindowsBoardRenderer::drawTile(Tile *tile, const vec2 position)
 {
 	SelectObject( dcBufferTarget, font );
 
-	const vec2 tileDimension = drawableBoard->getTileDimension();
+	const vec2 tilePosition = (position * drawableBoard->getTileDimension()) + drawableBoard->getBorderWeight();
 
-	const vec2 tilePosition = (position * tileDimension) + drawableBoard->getBorderWeight(); // +1 is because of the red border
-
-	//-- draw tile background --
-
-	COLORREF tileBackgroundColor = getTileBackgroundColor(tile, isCursorHovering(tilePosition));
-
-
-	HBRUSH brush = CreateSolidBrush(tileBackgroundColor);
-	SelectObject(dcBufferTarget, brush);
-
-	::Rectangle(dcBufferTarget, tilePosition.x, tilePosition.y, tilePosition.x + tileDimension.width, tilePosition.y + tileDimension.height);
-
-	DeleteObject(brush);
+	drawTileBackground(tile, tilePosition);
 
 	//-- draw character --
-	RECT charDrawRect = {tilePosition.x, tilePosition.y, tilePosition.x + tileDimension.width, tilePosition.y +
-			tileDimension.height};
+	drawTileCharacter(tile, tilePosition);
+}
 
-	char* tileChar = getRenderCharAndSetColor(tile);
 
-	SetBkMode(dcBufferTarget, TRANSPARENT);
-	DrawText(dcBufferTarget, tileChar, 1, &charDrawRect, DT_SINGLELINE | DT_CENTER | DT_VCENTER);
-	SetBkMode(dcBufferTarget, OPAQUE);
+void WindowsBoardRenderer::drawTileBackground(const Tile *tile, const vec2 tilePositionTopLeft)
+{
+	//-- draw tile background --
+
+	const COLORREF tileBackgroundColor = getTileBackgroundColor(tile, isCursorHovering(tilePositionTopLeft));
+
+	const HBRUSH tileBackgroundBrush = CreateSolidBrush(tileBackgroundColor);
+	SelectObject(dcBufferTarget, tileBackgroundBrush);
+
+	const vec2 tilePositionBottomRight = tilePositionTopLeft + drawableBoard->getTileDimension();
+
+	::Rectangle(dcBufferTarget, tilePositionTopLeft.x, tilePositionTopLeft.y, tilePositionBottomRight.x,
+	            tilePositionBottomRight.y);
+
+	DeleteObject(tileBackgroundBrush);
 }
 
 bool WindowsBoardRenderer::isCursorHovering(const vec2 tilePosition)
@@ -82,7 +81,7 @@ const vec2 WindowsBoardRenderer::getCursorPosition()
 	return vec2{cursorPosition.x, cursorPosition.y};
 }
 
-COLORREF WindowsBoardRenderer::getTileBackgroundColor(Tile *tile, bool isHovering)
+COLORREF WindowsBoardRenderer::getTileBackgroundColor(const Tile *tile, bool isHovering)
 {
 	if(isHovering || tile->getIsSelected())
 	{
@@ -100,7 +99,21 @@ COLORREF WindowsBoardRenderer::getTileBackgroundColor(Tile *tile, bool isHoverin
 
 }
 
-char *WindowsBoardRenderer::getRenderCharAndSetColor(Tile *tile)
+void WindowsBoardRenderer::drawTileCharacter(const Tile *tile, const vec2 tilePositionTopLeft)
+{
+	const vec2 tilePositionBottomRight = tilePositionTopLeft + drawableBoard->getTileDimension();
+
+	RECT tileCharRect = {tilePositionTopLeft.x, tilePositionTopLeft.y, tilePositionBottomRight.x,
+	                     tilePositionBottomRight.y};
+
+	const char* tileChar = getRenderCharAndSetColor(tile);
+
+	SetBkMode(dcBufferTarget, TRANSPARENT);
+	DrawText(dcBufferTarget, tileChar, 1, &tileCharRect, DT_SINGLELINE | DT_CENTER | DT_VCENTER);
+	SetBkMode(dcBufferTarget, OPAQUE);
+}
+
+char *WindowsBoardRenderer::getRenderCharAndSetColor(const Tile *tile)
 {
 	switch(tile->getType())
 	{
@@ -189,6 +202,7 @@ void WindowsBoardRenderer::renderEnd()
 	DeleteObject(bmp);
 	DeleteObject(dcBufferTarget);
 }
+
 
 
 
