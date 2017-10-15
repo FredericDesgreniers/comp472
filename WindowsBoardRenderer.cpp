@@ -22,9 +22,9 @@ void WindowsBoardRenderer::renderStart()
 	bmpold = (HBITMAP)SelectObject(dcBufferTarget, bmp);
 }
 
-void WindowsBoardRenderer::drawTile(Tile *tile, const vec2 position)
+void WindowsBoardRenderer::drawTile(Tile *tile)
 {
-	const vec2 tilePosition = (position * drawableBoard->getTileDimension()) + drawableBoard->getBorderWeight();
+	const vec2 tilePosition = (tile->getPosition() * drawableBoard->getTileDimension()) + drawableBoard->getBorderWeight();
 
 	drawTileBackground(tile, tilePosition);
 

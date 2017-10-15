@@ -21,7 +21,7 @@ void BoardRenderer::render()
 		{
 			vec2 tilePosition = {xPos, yPos};
 			Tile *tileToDraw = boardToRender->getTileAt(tilePosition);
-			drawTile(tileToDraw, tilePosition);
+			drawTile(tileToDraw);
 		}
 	}
 

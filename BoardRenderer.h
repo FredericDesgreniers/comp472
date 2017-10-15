@@ -17,7 +17,7 @@ protected:
 
 	}
 
-	virtual void drawTile(Tile* tile, const vec2 position)
+	virtual void drawTile(Tile* tile)
 	{
 
 	}

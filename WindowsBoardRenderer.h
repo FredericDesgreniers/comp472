@@ -24,7 +24,7 @@ class WindowsBoardRenderer: public BoardRenderer
 	void drawTileCharacter(const Tile* tile, const vec2 tilePositionTopLeft);
 
 protected:
-	void drawTile(Tile *tile, const vec2 position) override;
+	void drawTile(Tile *tile) override;
 
 	void drawBackground() override;
 
