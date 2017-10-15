@@ -12,13 +12,16 @@ void BoardRenderer::render()
 
 	Board* boardToRender = drawableBoard.getBoard();
 
+	const vec2 boardDimension = boardToRender->getDimension();
+
 	drawBackground();
-	for(int yPos = 0; yPos < boardToRender->getHeight(); yPos++)
+	for(int yPos = 0; yPos < boardDimension.height; yPos++)
 	{
-		for(int xPos = 0; xPos < boardToRender->getWidth(); xPos++)
+		for(int xPos = 0; xPos < boardDimension.width; xPos++)
 		{
-			Tile *tileToDraw = boardToRender->getTileAt(xPos, yPos);
-			drawTile(tileToDraw, xPos, yPos);
+			vec2 tilePosition = {xPos, yPos};
+			Tile *tileToDraw = boardToRender->getTileAt(tilePosition);
+			drawTile(tileToDraw, tilePosition);
 		}
 	}
 

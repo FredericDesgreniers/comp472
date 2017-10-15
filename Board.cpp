@@ -1,8 +1,9 @@
 #include "Board.h"
 #include "TileType.h"
-Board::Board(int width, int height):width(width), height(height)
+Board::Board(const vec2 dimension):dimension(dimension)
 {
-	int tileNum = width * height;
+	int tileNum = dimension.width * dimension.height;
+
 	tiles = new Tile*[tileNum];
 	for(int i=0; i < tileNum; i++)
 	{
@@ -10,76 +11,66 @@ Board::Board(int width, int height):width(width), height(height)
 	}
 
 
-	for(int yIndex = 0; yIndex < height; yIndex++)
+	for(int yIndex = 0; yIndex < dimension.height; yIndex++)
 	{
-		for(int xIndex = 0; xIndex < width; xIndex++)
+		for(int xIndex = 0; xIndex < dimension.width; xIndex++)
 		{
-			generateTile(xIndex, yIndex);
+			generateTile(vec2{xIndex, yIndex});
 		}
 	}
 }
 
 
-void Board::generateTile(int x, int y)
+void Board::generateTile(const vec2 position)
 {
-	bool isTileBlack = shouldTileGenerateBlack(x, y);
+	bool isTileBlack = shouldTileGenerateBlack(position);
 
-	if(y < 2)
+	if(position.y < 2)
 	{
-		setTileAt(x, y, new Tile(x, y, RED, isTileBlack));
+		setTileAt(position, new Tile(position, RED, isTileBlack));
 	}
-	else if(y > 2)
+	else if(position.y > 2)
 	{
-		setTileAt(x, y, new Tile(x, y, GREEN, isTileBlack));
+		setTileAt(position, new Tile(position, GREEN, isTileBlack));
 	}
 	else
 	{
-		if(x <4)
+		if(position.x <4)
 		{
-			setTileAt(x, y, new Tile(x, y, GREEN, isTileBlack));
+			setTileAt(position, new Tile(position, GREEN, isTileBlack));
 		}
-		else if(x > 4)
+		else if(position.x > 4)
 		{
-			setTileAt(x, y, new Tile(x, y, RED, isTileBlack));
+			setTileAt(position, new Tile(position, RED, isTileBlack));
 		}
 		else
 		{
-			setTileAt(x, y, new Tile(x, y, EMPTY, isTileBlack));
+			setTileAt(position, new Tile(position, EMPTY, isTileBlack));
 		}
 
 	}
 }
 
-bool Board::shouldTileGenerateBlack(int x, int y)
+bool Board::shouldTileGenerateBlack(const vec2 position)
 {
-	bool xMod2 = (x % 2) == 0;
-	bool yMod2 = (y % 2) == 0;
+	bool xMod2 = (position.x % 2) == 0;
+	bool yMod2 = (position.y % 2) == 0;
 
 	return (xMod2 && yMod2) || !(xMod2 || yMod2);
 
 }
 
-Tile *Board::getTileAt(int posX, int posY)
+Tile *Board::getTileAt(const vec2 position)
 {
-	return tiles[posY * width + posX];
+	return tiles[position.y * dimension.width + position.x];
 }
 
-void Board::setTileAt(int posX, int posY, Tile *tile)
+void Board::setTileAt(const vec2 position, Tile *tile)
 {
-	int tileArrayPosition = posY * width + posX;
+	int tileArrayPosition = position.y * dimension.width + position.x;
 	if(tiles[tileArrayPosition] != nullptr)
 	{
 		delete tiles[tileArrayPosition];
 	}
 	tiles[tileArrayPosition] = tile;
-}
-
-int Board::getWidth() const
-{
-	return width;
-}
-
-int Board::getHeight() const
-{
-	return height;
 }

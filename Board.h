@@ -7,23 +7,20 @@ class Board
 {
 private:
 	Tile** tiles;
-	int width;
-	int height;
+	const vec2 dimension;
 
-	void generateTile(int x, int y);
+	void generateTile(const vec2 position);
 
-	bool shouldTileGenerateBlack(int x, int y);
+	bool shouldTileGenerateBlack(const vec2 position);
 
 public:
-	Board(int width, int height);
+	Board(const vec2 dimension);
 
-	Tile* getTileAt(int posX, int posY);
+	Tile* getTileAt(const vec2 position);
 
-	void setTileAt(int posX, int posY, Tile* tile);
+	void setTileAt(const vec2 position, Tile* tile);
 
-	int getWidth() const;
-
-	int getHeight() const;
+	const vec2 getDimension(){return dimension;}
 };
 
 

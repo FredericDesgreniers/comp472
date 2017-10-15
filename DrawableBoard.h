@@ -10,38 +10,24 @@ class DrawableBoard
 private:
 	Board *board;
 
-	int x;
-	int y;
+	vec2 position;
 
-	int tileWidth = 60;
-	int tileHeight = 60;
+	vec2 tileDimension = {60,60};
 
 public:
-	DrawableBoard(Board *board, int x, int y);
+	DrawableBoard(Board *board, vec2 position);
 
-	int getPixelPositionX();
-	int getPixelPositionY();
+	const vec2 getPixelPosition();
 
-	int getPixelWidth();
-	int  getPixelHeight();
-
-	int getX() const;
-
-	void setX(int x);
-
-	int getY() const;
-
-	void setY(int y);
+	const vec2 getPixelDimension();
 
 	Board *getBoard();
 
-	int getTileWidth() const;
+	const vec2 getPosition(){return position;}
+	void setPosition(vec2 position){this->position = position;};
 
-	void setTileWidth(int tileWidth);
-
-	int getTileHeight() const;
-
-	void setTileHeight(int tileHeight);
+	const vec2 getTileDimension(){return tileDimension;}
+	void setTileDimension(vec2 tileDimension){this->tileDimension= tileDimension;};
 
 };
 

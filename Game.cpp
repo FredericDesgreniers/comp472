@@ -22,7 +22,7 @@ void onClick(BoardRenderer *boardRenderer, HWND targetHandle)
 	GetCursorPos(&pt);
 	ScreenToClient(targetHandle, &pt);
 
-	Tile* tile = boardRenderer->getTileAtDisplayCoordinates(pt.x, pt.y);
+	Tile* tile = boardRenderer->getTileAtDisplayCoordinates(vec2{pt.x, pt.y});
 
 	if(tile == nullptr)
 	{
@@ -41,13 +41,13 @@ void onClick(BoardRenderer *boardRenderer, HWND targetHandle)
 	}
 	else if(selectedTile != nullptr)
 	{
-		int destinationTileX = boardRenderer->getTilePosXFromDisplayCoordinates(pt.x);
-		int destinationTileY = boardRenderer->getTilePosYFromDisplayCoordinates(pt.y);
+		const vec2 destinationTile = boardRenderer->getTilePositionFromDisplayPosition(vec2{pt.x, pt.y});
 
-		if (destinationTileX >= 0 && destinationTileY >= 0)
+		if (destinationTile.x >= 0 && destinationTile.y >= 0)
 		{
-			doMove(boardRenderer->getDrawableBoard().getBoard(), selectedTile->getX(), selectedTile->getY(),
-			       destinationTileX, destinationTileY);
+			doMove(boardRenderer->getDrawableBoard().getBoard(), selectedTile->getPosition().x,
+			       selectedTile->getPosition().y,
+			       destinationTile.x, destinationTile.y);
 
 			selectedTile->setIsSelected(false);
 			selectedTile = nullptr;
@@ -140,9 +140,9 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	}
 
 	ShowWindow(hWnd, true);
-	Board board(9,5);
+	Board board({9, 5});
 
-	DrawableBoard drawableBoard(&board, 20, 20);
+	DrawableBoard drawableBoard(&board, {20, 20});
 
 	boardRenderer = new WindowsBoardRenderer(drawableBoard, hWnd);
 

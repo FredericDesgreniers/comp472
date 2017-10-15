@@ -14,7 +14,7 @@ class WindowsBoardRenderer: public BoardRenderer
 	char* getRenderCharAndSetColor(Tile *tile);
 
 protected:
-	void drawTile(Tile *tile, int x, int y) override;
+	void drawTile(Tile *tile, const vec2 position) override;
 
 	void drawBackground() override;
 
@@ -23,11 +23,9 @@ protected:
 
 public:
 	WindowsBoardRenderer(DrawableBoard drawableBoard, HWND handleTarget);
-	Tile* getTileAtDisplayCoordinates(int x, int y) override;
+	Tile* getTileAtDisplayCoordinates(const vec2 position) override;
 
-	int getTilePosXFromDisplayCoordinates(int x) override ;
-
-	int getTilePosYFromDisplayCoordinates(int y)override ;
+	const vec2 getTilePositionFromDisplayPosition(const vec2 position) override;
 
 	HDC getTargetDC(){return dcTarget;};
 };

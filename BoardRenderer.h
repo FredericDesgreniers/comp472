@@ -17,7 +17,7 @@ protected:
 
 	}
 
-	virtual void drawTile(Tile* tile, int x, int y)
+	virtual void drawTile(Tile* tile, const vec2 position)
 	{
 
 	}
@@ -33,20 +33,16 @@ public:
 
 	void render();
 
-	virtual Tile* getTileAtDisplayCoordinates(int x, int y)
+	virtual Tile* getTileAtDisplayCoordinates(const vec2 position)
 	{
 		return nullptr;
 	}
 
-	virtual int getTilePosXFromDisplayCoordinates(int x)
+	virtual const vec2 getTilePositionFromDisplayPosition(const vec2 position)
 	{
-		return -1;
+		return {-1, -1};
 	}
 
-	virtual int getTilePosYFromDisplayCoordinates(int y)
-	{
-		return -1;
-	}
 	DrawableBoard getDrawableBoard(){return drawableBoard;};
 };
 

@@ -10,27 +10,33 @@ WindowsBoardRenderer::WindowsBoardRenderer(DrawableBoard drawableBoard, HWND han
 
 }
 
-void WindowsBoardRenderer::drawTile(Tile *tile, int x, int y)
+void WindowsBoardRenderer::drawTile(Tile *tile, const vec2 position)
 {
 	SelectObject( dcBufferTarget, font );
 
+	const vec2 tileDimension = drawableBoard.getTileDimension();
+
 	//TODO remove magic numbers
 	// +1 is because of the red border
-	int tilePosX = x * drawableBoard.getTileWidth() + 1;
-	int tilePosY = y * drawableBoard.getTileHeight() + 1;
+	const vec2 tilePosition = (position * tileDimension) + 1;
 
 	POINT pt;
 	GetCursorPos(&pt);
 	ScreenToClient(handleTarget, &pt);
 
-	int relativeMousePosX = pt.x - drawableBoard.getX();
-	int relativeMousePosY = pt.y - drawableBoard.getY();
+	const vec2 boardPosition = drawableBoard.getPosition();
+	const vec2 cursorPoint = {pt.x, pt.y};
+
+	const vec2 relativeMousePosition = cursorPoint - boardPosition;
+
+	const vec2 tileTopLeft = tilePosition;
+	const vec2 tileBottomRight = tilePosition + tileDimension;
 
 	bool isHovering = false;
-	if(relativeMousePosX > tilePosX &&
-			relativeMousePosX < tilePosX + drawableBoard.getTileWidth()
-			&& relativeMousePosY > tilePosY &&
-			relativeMousePosY < tilePosY + drawableBoard.getTileHeight())
+	if(relativeMousePosition.x > tileTopLeft.x &&
+			relativeMousePosition.x < tileBottomRight.x
+			&& relativeMousePosition.y > tileTopLeft.y &&
+			relativeMousePosition.y < tileBottomRight.y)
 	{
 		isHovering = true;
 	}
@@ -57,19 +63,20 @@ void WindowsBoardRenderer::drawTile(Tile *tile, int x, int y)
 
 	SelectObject(dcBufferTarget, brush);
 
-	::Rectangle(dcBufferTarget, tilePosX, tilePosY, tilePosX + drawableBoard.getTileWidth(), tilePosY + drawableBoard.getTileHeight());
+	::Rectangle(dcBufferTarget, tilePosition.x, tilePosition.y, tilePosition.x + tileDimension.width, tilePosition.y + tileDimension.height);
 
 	DeleteObject(brush);
 
 
-	RECT tileDimension = {tilePosX, tilePosY, tilePosX + drawableBoard.getTileWidth(), tilePosY + drawableBoard.getTileHeight()};
+	RECT tileDrawRect = {tilePosition.x, tilePosition.y, tilePosition.x + tileDimension.width, tilePosition.y +
+			tileDimension.height};
 
 
 	SetBkMode(dcBufferTarget, TRANSPARENT);
 
 	char* tileChar = getRenderCharAndSetColor(tile);
 
-	DrawText(dcBufferTarget, tileChar, 1, &tileDimension, DT_SINGLELINE | DT_CENTER | DT_VCENTER);
+	DrawText(dcBufferTarget, tileChar, 1, &tileDrawRect, DT_SINGLELINE | DT_CENTER | DT_VCENTER);
 }
 
 char *WindowsBoardRenderer::getRenderCharAndSetColor(Tile *tile)
@@ -100,76 +107,71 @@ char *WindowsBoardRenderer::getRenderCharAndSetColor(Tile *tile)
 
 void WindowsBoardRenderer::drawBackground()
 {
-	int startX = 0;
-	int startY = 0;
-	int endX = startX + drawableBoard.getBoard()->getWidth() * drawableBoard.getTileWidth() + 2;
-	int endY = startY + drawableBoard.getBoard()->getHeight() * drawableBoard.getTileHeight() + 2;
+	const vec2 boardDimension = drawableBoard.getBoard()->getDimension();
+
+	vec2 start = {0, 0};
+	vec2 end = start + (boardDimension * drawableBoard.getTileDimension()) + 2;
 
 	HPEN pen = CreatePen(PS_SOLID, 2, RGB(0,0,0));
 
 	SelectObject(dcBufferTarget, pen);
 
-	MoveToEx(dcBufferTarget, startX, startY, (LPPOINT)NULL);
-	LineTo(dcBufferTarget, startX, endY);
-	LineTo(dcBufferTarget, endX, endY);
-	LineTo(dcBufferTarget, endX, startY);
-	LineTo(dcBufferTarget, startX, startY);
+	MoveToEx(dcBufferTarget, start.x, start.y, (LPPOINT)NULL);
+	LineTo(dcBufferTarget, start.x, end.y);
+	LineTo(dcBufferTarget, end.x, end.y);
+	LineTo(dcBufferTarget, end.x, start.y);
+	LineTo(dcBufferTarget, start.x, start.y);
 	DeleteObject(pen);
 }
 
-Tile *WindowsBoardRenderer::getTileAtDisplayCoordinates(int x, int y)
+Tile *WindowsBoardRenderer::getTileAtDisplayCoordinates(const vec2 position)
 {
-	int tilePosX = getTilePosXFromDisplayCoordinates(x);
-	int tilePosY = getTilePosYFromDisplayCoordinates(y);
+	vec2 tilePosition = getTilePositionFromDisplayPosition(position);
 
-	if(tilePosX >= 0 && tilePosY >= 0)
+	if(tilePosition.x >= 0 && tilePosition.y >= 0)
 	{
-		return drawableBoard.getBoard()->getTileAt(tilePosX, tilePosY);
+		return drawableBoard.getBoard()->getTileAt(tilePosition);
 	}
 
 	return nullptr;
 }
 
-int WindowsBoardRenderer::getTilePosXFromDisplayCoordinates(int x)
+
+const vec2 WindowsBoardRenderer::getTilePositionFromDisplayPosition(const vec2 position)
 {
-	int relativeX = x - drawableBoard.getX();
+	vec2 relativePosition = position - drawableBoard.getPosition();
 
-	if(relativeX > 0 && relativeX < drawableBoard.getPixelWidth())
+	const vec2 boardPixelDimension = drawableBoard.getPixelDimension();
+
+	if(relativePosition.x > 0 && relativePosition.x < boardPixelDimension.width
+		&& relativePosition.y > 0 && relativePosition.y < boardPixelDimension.height)
 	{
-		int tilePosX = relativeX / drawableBoard.getTileWidth();
+		vec2 tilePosition = relativePosition / drawableBoard.getTileDimension();
 
-		return tilePosX;
+		return tilePosition;
 	}
 
-	return -1;
-}
-
-int WindowsBoardRenderer::getTilePosYFromDisplayCoordinates(int y)
-{
-	int relativeY = y - drawableBoard.getY();
-
-	if(relativeY > 0 && relativeY < drawableBoard.getPixelHeight())
-	{
-		int tilePosY = relativeY / drawableBoard.getTileHeight();
-
-		return tilePosY;
-	}
-
-	return -1;
+	return {-1, -1};
 }
 
 void WindowsBoardRenderer::renderStart()
 {
 	dcBufferTarget = CreateCompatibleDC(NULL);
 
-	bmp = CreateCompatibleBitmap( getTargetDC(), drawableBoard.getPixelWidth() + 2, drawableBoard.getPixelHeight() + 2);
+	vec2 boardPixelDimension = drawableBoard.getPixelDimension();
+
+	bmp = CreateCompatibleBitmap( getTargetDC(), boardPixelDimension.width + 2, boardPixelDimension.height + 2);
 	bmpold = (HBITMAP)SelectObject(dcBufferTarget, bmp);
 }
 
 
 void WindowsBoardRenderer::renderEnd()
 {
-	BitBlt(dcTarget, drawableBoard.getX(), drawableBoard.getY(), drawableBoard.getPixelWidth() + 2, drawableBoard.getPixelHeight() + 2, dcBufferTarget, 0, 0, SRCCOPY);
+	vec2 boardPosition = drawableBoard.getPosition();
+	vec2 boardPixelDimension = drawableBoard.getPixelDimension();
+
+	BitBlt(dcTarget, boardPosition.x, boardPosition.y, boardPixelDimension.width + 2, boardPixelDimension.height + 2,
+	       dcBufferTarget, 0, 0, SRCCOPY);
 
 	BoardRenderer::renderEnd();
 
@@ -177,8 +179,6 @@ void WindowsBoardRenderer::renderEnd()
 	DeleteObject(bmp);
 	DeleteObject(dcBufferTarget);
 }
-
-
 
 
 
