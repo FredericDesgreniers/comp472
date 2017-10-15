@@ -1,8 +1,9 @@
 #include "Board.h"
 #include "TileType.h"
+
 Board::Board(const vec2 dimension):dimension(dimension)
 {
-	int tileNum = dimension.width * dimension.height;
+	int tileNum = getArea(dimension);
 
 	tiles = new Tile*[tileNum];
 	for(int i=0; i < tileNum; i++)
