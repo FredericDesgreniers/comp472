@@ -15,8 +15,7 @@ void WindowsBoardRenderer::renderStart()
 {
 	dcBufferTarget = CreateCompatibleDC(NULL);
 
-	const vec2 boardDimensionIncludingBorder = drawableBoard->getPixelDimension() + (getDrawableBoard()
-			->getBorderWeight() * 2);
+	const vec2 boardDimensionIncludingBorder = drawableBoard->getPixelDimension() + (getDrawableBoard()->getBorderWeight() * 2);
 
 	bmp = CreateCompatibleBitmap( getTargetDC(), boardDimensionIncludingBorder.width,
 	                              boardDimensionIncludingBorder.height);
