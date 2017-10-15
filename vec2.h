@@ -9,6 +9,15 @@ union vec2{
 		int width;
 		int height;
 	};
+	vec2(int value){
+		x = value;
+		y = value;
+	}
+	vec2(int a, int b)
+	{
+		x = a;
+		y = b;
+	}
 };
 
 inline int getDistanceSquared(const vec2 vector)
@@ -39,24 +48,4 @@ inline vec2 operator*(const vec2 &left, const vec2 &right)
 inline vec2 operator/(const vec2 &left, const vec2 &right)
 {
 	return vec2{left.x / right.x, left.y / right.y};
-}
-
-inline vec2 operator+(const vec2 &left, const int &right)
-{
-	return vec2{left.x + right, left.y + right};
-}
-
-inline vec2 operator-(const vec2 &left, const int &right)
-{
-	return vec2{left.x - right, left.y - right};
-}
-
-inline vec2 operator*(const vec2 &left, const int &right)
-{
-	return vec2{left.x * right, left.y * right};
-}
-
-inline vec2 operator/(const vec2 &left, int &right)
-{
-	return vec2{left.x / right, left.y / right};
 }

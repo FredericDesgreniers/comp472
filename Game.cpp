@@ -106,7 +106,16 @@ void iniGame(HWND windowHandle)
 	DrawableBoard *drawableBoard = new DrawableBoard(board, boardPosition);
 
 	boardRenderer = new WindowsBoardRenderer(drawableBoard, windowHandle);
+}
 
+void runWindowMessageLoop(HWND windowHandle)
+{
+	MSG msg;
+	while (GetMessage(&msg, windowHandle, 0, 0))
+	{
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
+	}
 }
 
 int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
@@ -155,15 +164,11 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 		return 1;
 	}
 
-	iniGame(windowHandle);
-
 	ShowWindow(windowHandle, true);
 
-	MSG msg;
-	while (GetMessage(&msg, windowHandle, 0, 0))
-	{
-		TranslateMessage(&msg);
-		DispatchMessage(&msg);
-	}
+	iniGame(windowHandle);
+
+	runWindowMessageLoop(windowHandle);
+
 	return 0;
 }
