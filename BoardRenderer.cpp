@@ -1,7 +1,7 @@
 
 #include "BoardRenderer.h"
 
-BoardRenderer::BoardRenderer(DrawableBoard drawableBoard): drawableBoard(drawableBoard)
+BoardRenderer::BoardRenderer(DrawableBoard *drawableBoard): drawableBoard(drawableBoard)
 {
 
 }
@@ -10,7 +10,7 @@ void BoardRenderer::render()
 {
 	renderStart();
 
-	Board* boardToRender = drawableBoard.getBoard();
+	Board* boardToRender = drawableBoard->getBoard();
 
 	const vec2 boardDimension = boardToRender->getDimension();
 

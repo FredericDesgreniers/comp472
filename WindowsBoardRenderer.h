@@ -13,6 +13,8 @@ class WindowsBoardRenderer: public BoardRenderer
 
 	char* getRenderCharAndSetColor(Tile *tile);
 
+	bool isCursorHovering(const vec2 tilePosition, const vec2 cursorPosition);
+
 protected:
 	void drawTile(Tile *tile, const vec2 position) override;
 
@@ -22,7 +24,7 @@ protected:
 	void renderEnd() override;
 
 public:
-	WindowsBoardRenderer(DrawableBoard drawableBoard, HWND handleTarget);
+	WindowsBoardRenderer(DrawableBoard *drawableBoard, HWND handleTarget);
 	Tile* getTileAtDisplayCoordinates(const vec2 position) override;
 
 	const vec2 getTilePositionFromDisplayPosition(const vec2 position) override;

@@ -5,7 +5,7 @@
 class BoardRenderer
 {
 protected:
-	DrawableBoard drawableBoard;
+	DrawableBoard *drawableBoard;
 
 	virtual void renderStart()
 	{
@@ -29,7 +29,7 @@ protected:
 
 
 public:
-	BoardRenderer(DrawableBoard drawableBoard);
+	BoardRenderer(DrawableBoard *drawableBoard);
 
 	void render();
 
@@ -43,7 +43,7 @@ public:
 		return {-1, -1};
 	}
 
-	DrawableBoard getDrawableBoard(){return drawableBoard;};
+	DrawableBoard *getDrawableBoard(){return drawableBoard;};
 };
 
 

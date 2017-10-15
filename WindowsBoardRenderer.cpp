@@ -2,7 +2,8 @@
 #include <iostream>
 #include "WindowsBoardRenderer.h"
 
-WindowsBoardRenderer::WindowsBoardRenderer(DrawableBoard drawableBoard, HWND handleTarget):BoardRenderer(drawableBoard), handleTarget(handleTarget)
+WindowsBoardRenderer::WindowsBoardRenderer(DrawableBoard *drawableBoard, HWND handleTarget):BoardRenderer
+		                                                                                            (drawableBoard), handleTarget(handleTarget)
 {
 	dcTarget = GetDC(handleTarget);
 
@@ -14,7 +15,7 @@ void WindowsBoardRenderer::drawTile(Tile *tile, const vec2 position)
 {
 	SelectObject( dcBufferTarget, font );
 
-	const vec2 tileDimension = drawableBoard.getTileDimension();
+	const vec2 tileDimension = drawableBoard->getTileDimension();
 
 	//TODO remove magic numbers
 	// +1 is because of the red border
@@ -24,23 +25,7 @@ void WindowsBoardRenderer::drawTile(Tile *tile, const vec2 position)
 	GetCursorPos(&pt);
 	ScreenToClient(handleTarget, &pt);
 
-	const vec2 boardPosition = drawableBoard.getPosition();
-	const vec2 cursorPoint = {pt.x, pt.y};
-
-	const vec2 relativeMousePosition = cursorPoint - boardPosition;
-
-	const vec2 tileTopLeft = tilePosition;
-	const vec2 tileBottomRight = tilePosition + tileDimension;
-
-	bool isHovering = false;
-	if(relativeMousePosition.x > tileTopLeft.x &&
-			relativeMousePosition.x < tileBottomRight.x
-			&& relativeMousePosition.y > tileTopLeft.y &&
-			relativeMousePosition.y < tileBottomRight.y)
-	{
-		isHovering = true;
-	}
-
+	bool isHovering = isCursorHovering(tilePosition, {pt.x, pt.y});
 
 
 	HBRUSH brush;
@@ -107,10 +92,10 @@ char *WindowsBoardRenderer::getRenderCharAndSetColor(Tile *tile)
 
 void WindowsBoardRenderer::drawBackground()
 {
-	const vec2 boardDimension = drawableBoard.getBoard()->getDimension();
+	const vec2 boardDimension = drawableBoard->getBoard()->getDimension();
 
 	vec2 start = {0, 0};
-	vec2 end = start + (boardDimension * drawableBoard.getTileDimension()) + 2;
+	vec2 end = start + (boardDimension * drawableBoard->getTileDimension()) + 2;
 
 	HPEN pen = CreatePen(PS_SOLID, 2, RGB(0,0,0));
 
@@ -130,7 +115,7 @@ Tile *WindowsBoardRenderer::getTileAtDisplayCoordinates(const vec2 position)
 
 	if(tilePosition.x >= 0 && tilePosition.y >= 0)
 	{
-		return drawableBoard.getBoard()->getTileAt(tilePosition);
+		return drawableBoard->getBoard()->getTileAt(tilePosition);
 	}
 
 	return nullptr;
@@ -139,14 +124,14 @@ Tile *WindowsBoardRenderer::getTileAtDisplayCoordinates(const vec2 position)
 
 const vec2 WindowsBoardRenderer::getTilePositionFromDisplayPosition(const vec2 position)
 {
-	vec2 relativePosition = position - drawableBoard.getPosition();
+	vec2 relativePosition = position - drawableBoard->getPosition();
 
-	const vec2 boardPixelDimension = drawableBoard.getPixelDimension();
+	const vec2 boardPixelDimension = drawableBoard->getPixelDimension();
 
 	if(relativePosition.x > 0 && relativePosition.x < boardPixelDimension.width
 		&& relativePosition.y > 0 && relativePosition.y < boardPixelDimension.height)
 	{
-		vec2 tilePosition = relativePosition / drawableBoard.getTileDimension();
+		vec2 tilePosition = relativePosition / drawableBoard->getTileDimension();
 
 		return tilePosition;
 	}
@@ -158,7 +143,7 @@ void WindowsBoardRenderer::renderStart()
 {
 	dcBufferTarget = CreateCompatibleDC(NULL);
 
-	vec2 boardPixelDimension = drawableBoard.getPixelDimension();
+	vec2 boardPixelDimension = drawableBoard->getPixelDimension();
 
 	bmp = CreateCompatibleBitmap( getTargetDC(), boardPixelDimension.width + 2, boardPixelDimension.height + 2);
 	bmpold = (HBITMAP)SelectObject(dcBufferTarget, bmp);
@@ -167,8 +152,8 @@ void WindowsBoardRenderer::renderStart()
 
 void WindowsBoardRenderer::renderEnd()
 {
-	vec2 boardPosition = drawableBoard.getPosition();
-	vec2 boardPixelDimension = drawableBoard.getPixelDimension();
+	vec2 boardPosition = drawableBoard->getPosition();
+	vec2 boardPixelDimension = drawableBoard->getPixelDimension();
 
 	BitBlt(dcTarget, boardPosition.x, boardPosition.y, boardPixelDimension.width + 2, boardPixelDimension.height + 2,
 	       dcBufferTarget, 0, 0, SRCCOPY);
@@ -178,6 +163,27 @@ void WindowsBoardRenderer::renderEnd()
 	SelectObject(dcBufferTarget, bmpold);
 	DeleteObject(bmp);
 	DeleteObject(dcBufferTarget);
+}
+
+bool WindowsBoardRenderer::isCursorHovering(const vec2 tilePosition, const vec2 cursorPosition)
+{
+	const vec2 tileDimension = drawableBoard->getTileDimension();
+	const vec2 boardPosition = drawableBoard->getPosition();
+	const vec2 relativeMousePosition = cursorPosition - boardPosition;
+
+	const vec2 tileTopLeft = tilePosition;
+	const vec2 tileBottomRight = tilePosition + tileDimension;
+
+	bool isHovering = false;
+	if(relativeMousePosition.x > tileTopLeft.x &&
+	   relativeMousePosition.x < tileBottomRight.x
+	   && relativeMousePosition.y > tileTopLeft.y &&
+	   relativeMousePosition.y < tileBottomRight.y)
+	{
+		isHovering = true;
+	}
+	return isHovering;
+
 }
 
 

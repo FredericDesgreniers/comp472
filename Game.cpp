@@ -47,7 +47,7 @@ void onClick(BoardRenderer *boardRenderer, HWND targetHandle)
 
 		if (destinationTile.x >= 0 && destinationTile.y >= 0)
 		{
-			doMove(boardRenderer->getDrawableBoard().getBoard(), selectedTile->getPosition().x,
+			doMove(boardRenderer->getDrawableBoard()->getBoard(), selectedTile->getPosition().x,
 			       selectedTile->getPosition().y,
 			       destinationTile.x, destinationTile.y);
 
@@ -63,7 +63,10 @@ LRESULT CALLBACK WndProc(HWND   hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
 		case WM_PAINT:
 		{
-			boardRenderer->render();
+			if(boardRenderer != nullptr)
+			{
+				boardRenderer->render();
+			}
 		}break;
 
 		case WM_CLOSE:
@@ -99,20 +102,11 @@ void iniGame(HWND windowHandle)
 	const vec2 boardPosition = {20, 20};
 	const vec2 boardDimension = {9, 5};
 
-	Board board(boardDimension);
-	DrawableBoard drawableBoard(&board, boardPosition);
+	Board *board = new Board(boardDimension);
+	DrawableBoard *drawableBoard = new DrawableBoard(board, boardPosition);
 
 	boardRenderer = new WindowsBoardRenderer(drawableBoard, windowHandle);
-}
 
-void runMessageLoop()
-{
-	MSG msg;
-	while (GetMessage(&msg, NULL, 0, 0))
-	{
-		TranslateMessage(&msg);
-		DispatchMessage(&msg);
-	}
 }
 
 int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
@@ -139,7 +133,7 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
 		return 1;
 	}
-	HWND hWnd = CreateWindow(
+	HWND windowHandle = CreateWindow(
 			windowClass.lpszClassName,
 			"Game test",
 			WS_OVERLAPPEDWINDOW,
@@ -150,7 +144,7 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 			hInstance,
 			NULL
 	);
-	if (!hWnd)
+	if (!windowHandle)
 	{
 
 		MessageBox(NULL,
@@ -161,11 +155,15 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 		return 1;
 	}
 
-	ShowWindow(hWnd, true);
+	iniGame(windowHandle);
 
-	iniGame(hWnd);
+	ShowWindow(windowHandle, true);
 
-	runMessageLoop();
-
+	MSG msg;
+	while (GetMessage(&msg, windowHandle, 0, 0))
+	{
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
+	}
 	return 0;
 }
