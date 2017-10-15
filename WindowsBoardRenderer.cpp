@@ -30,15 +30,12 @@ void WindowsBoardRenderer::drawTile(Tile *tile, const vec2 position)
 
 	drawTileBackground(tile, tilePosition);
 
-	//-- draw character --
 	drawTileCharacter(tile, tilePosition);
 }
 
 
 void WindowsBoardRenderer::drawTileBackground(const Tile *tile, const vec2 tilePositionTopLeft)
 {
-	//-- draw tile background --
-
 	const COLORREF tileBackgroundColor = getTileBackgroundColor(tile, isCursorHovering(tilePositionTopLeft));
 
 	const HBRUSH tileBackgroundBrush = CreateSolidBrush(tileBackgroundColor);
