@@ -1,13 +1,18 @@
 #pragma once
 
-union vec2{
-	struct{
-		int x;
-		int y;
-	};
-	struct{
-		int width;
-		int height;
+struct vec2{
+	union
+	{
+		struct
+		{
+			int x;
+			int y;
+		};
+		struct
+		{
+			int width;
+			int height;
+		};
 	};
 	vec2(int value){
 		x = value;
