@@ -63,6 +63,10 @@ bool Board::shouldTileGenerateBlack(const vec2 position)
 
 Tile *Board::getTileAt(const vec2 position)
 {
+	if(position.x < 0 || position.y < 0 || position.x >= dimension.width || position.y >= dimension.height)
+	{
+		return nullptr;
+	}
 	return tiles[position.y * dimension.width + position.x];
 }
 
@@ -71,7 +75,7 @@ void Board::setTileAt(const vec2 position, Tile *tile)
 	int tileArrayPosition = position.y * dimension.width + position.x;
 	if(tiles[tileArrayPosition] != nullptr)
 	{
-		delete tiles[tileArrayPosition];
+		//delete tiles[tileArrayPosition];
 	}
 	tiles[tileArrayPosition] = tile;
 }

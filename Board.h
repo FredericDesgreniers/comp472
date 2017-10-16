@@ -11,7 +11,7 @@ private:
 
 	void generateTile(const vec2 position);
 
-	bool shouldTileGenerateBlack(const vec2 position);
+
 
 public:
 	Board(const vec2 dimension);
@@ -21,6 +21,8 @@ public:
 	void setTileAt(const vec2 position, Tile* tile);
 
 	const vec2 getDimension(){return dimension;}
+
+	bool shouldTileGenerateBlack(const vec2 position);
 };
 
 

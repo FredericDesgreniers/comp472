@@ -4,15 +4,69 @@
 #include "BoardRenderer.h"
 #include "WindowsBoardRenderer.h"
 #include <string>
+#include <iostream>
 
 bool wasMousePressed = false;
 BoardRenderer *boardRenderer;
 
 Tile *selectedTile = nullptr;
 
-void doMove(Board *board, int sourceX, int sourceY, int destinationX, int destinationY)
+bool propagateMoveInDirection(Board *board, const TileType originalType, const vec2 currentPosition, const vec2
+direction)
 {
+	const vec2 positionInDirection = currentPosition + direction;
+	Tile *tileAtNewPosition = board->getTileAt(positionInDirection);
 
+	if(tileAtNewPosition != nullptr)
+	{
+		TileType tileTypeAtNewPosition = tileAtNewPosition->getType();
+		if(tileTypeAtNewPosition != EMPTY && tileTypeAtNewPosition != originalType)
+		{
+			std::cout << positionInDirection.x << ", " << positionInDirection.y << std::endl;
+
+			propagateMoveInDirection(board, originalType, positionInDirection, direction);
+			board->setTileAt(positionInDirection, new Tile(positionInDirection, EMPTY, tileAtNewPosition->getIsBlack()));
+			return true;
+		}
+	}
+
+	return false;
+}
+
+void doMove(Board *board, const vec2 source, const vec2 destination)
+{
+	const vec2 direction = destination - source;
+
+	if(abs(direction.x) > 1 || abs(direction.y) > 1)
+	{
+		//this move is not valid since the destination is too far away
+		return;
+	}
+
+	bool diagonal = !((direction.x == 0) || (direction.y == 0));
+	Tile *sourceTile = board->getTileAt(source);
+	if(!sourceTile->getIsBlack() && diagonal)
+	{
+		//This move is not valid because it does diagonal on not black
+		return;
+	}
+
+	if(!propagateMoveInDirection(board,sourceTile->getType(), destination, direction))
+	{
+		const vec2 oppositeDirection({-direction.x, -direction.y});
+		propagateMoveInDirection(board, sourceTile->getType(), source, oppositeDirection);
+	}
+	const vec2 newPosition = source + direction;
+
+	Tile* newTileAtSource = board->getTileAt(newPosition);
+	newTileAtSource->setPosition(source);
+	bool blackAtNewPosition = newTileAtSource->getIsBlack();
+	newTileAtSource->setIsBlack(sourceTile->getIsBlack());
+	board->setTileAt(source, newTileAtSource);
+
+	sourceTile->setPosition(newPosition);
+	sourceTile->setIsBlack(blackAtNewPosition);
+	board->setTileAt(newPosition, sourceTile);
 }
 
 void onClick(BoardRenderer *boardRenderer, HWND targetHandle)
@@ -47,9 +101,7 @@ void onClick(BoardRenderer *boardRenderer, HWND targetHandle)
 
 		if (destinationTile.x >= 0 && destinationTile.y >= 0)
 		{
-			doMove(boardRenderer->getDrawableBoard()->getBoard(), selectedTile->getPosition().x,
-			       selectedTile->getPosition().y,
-			       destinationTile.x, destinationTile.y);
+			doMove(boardRenderer->getDrawableBoard()->getBoard(), selectedTile->getPosition(),destinationTile);
 
 			selectedTile->setIsSelected(false);
 			selectedTile = nullptr;
