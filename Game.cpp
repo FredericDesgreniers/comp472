@@ -11,6 +11,16 @@ BoardRenderer *boardRenderer;
 
 Tile *selectedTile = nullptr;
 
+/*
+ * TODO All the code related to moving needs to be pulled out
+ * Since it does not belong in the main game class
+ *
+ * Maybe in a Player class? Or the board class?
+ */
+
+//This propagates a move in a vertain direction.
+// It returns true if it manages to kill at least one tile
+// Returns false if not
 bool propagateMoveInDirection(Board *board, const TileType originalType, const vec2 currentPosition, const vec2
 direction)
 {
@@ -33,6 +43,8 @@ direction)
 	return false;
 }
 
+//Try to do a move from source to destination
+//TODO need to handle turns
 void doMove(Board *board, const vec2 source, const vec2 destination)
 {
 	const vec2 direction = destination - source;
@@ -51,6 +63,8 @@ void doMove(Board *board, const vec2 source, const vec2 destination)
 		return;
 	}
 
+	//Try both forward and backward moves
+	//Forward takes priority, backwards only gets tried when forward returns false
 	if(!propagateMoveInDirection(board,sourceTile->getType(), destination, direction))
 	{
 		const vec2 oppositeDirection({-direction.x, -direction.y});
@@ -58,6 +72,7 @@ void doMove(Board *board, const vec2 source, const vec2 destination)
 	}
 	const vec2 newPosition = source + direction;
 
+	//This swaps the tiles, which swaps the color and position
 	Tile* newTileAtSource = board->getTileAt(newPosition);
 	newTileAtSource->setPosition(source);
 	bool blackAtNewPosition = newTileAtSource->getIsBlack();
@@ -69,6 +84,12 @@ void doMove(Board *board, const vec2 source, const vec2 destination)
 	board->setTileAt(newPosition, sourceTile);
 }
 
+/**
+ * TODO Code below needs to be pulled out
+ * Consider maybe an Input controller?
+ */
+
+//Gets called when a click event happens
 void onClick(BoardRenderer *boardRenderer, HWND targetHandle)
 {
 
@@ -85,7 +106,11 @@ void onClick(BoardRenderer *boardRenderer, HWND targetHandle)
 		return;
 	}
 
-	if(!(tile->getType() == EMPTY))
+	//selection logic
+	//If the tile clicked is not empty, we select it
+	//If the tile clicked is empty and a tile has been previously selected, we try to make a move
+
+	if(tile->getType() != EMPTY)
 	{
 		if(selectedTile != nullptr)
 		{
@@ -108,6 +133,12 @@ void onClick(BoardRenderer *boardRenderer, HWND targetHandle)
 		}
 	}
 }
+
+/**
+ * TODO All the code relating to the Windows api should be pulled out
+ * Would make it simpler to change to an api like SDL later
+ * Consider making an interface so we can just switch implementation
+ */
 
 LRESULT CALLBACK WndProc(HWND   hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
