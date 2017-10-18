@@ -5,11 +5,7 @@ Board::Board(const vec2 dimension):dimension(dimension)
 {
 	int tileNum = getArea(dimension);
 
-	tiles = new Tile*[tileNum];
-	for(int i=0; i < tileNum; i++)
-	{
-		tiles[i] = nullptr;
-	}
+	tiles = new Tile*[tileNum]{nullptr};
 
 
 	for(int yIndex = 0; yIndex < dimension.height; yIndex++)
