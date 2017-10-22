@@ -11,6 +11,8 @@ BoardRenderer *boardRenderer;
 
 Tile *selectedTile = nullptr;
 
+TileType currentTurn = GREEN;
+
 /*
  * TODO All the code related to moving needs to be pulled out
  * Since it does not belong in the main game class
@@ -57,6 +59,12 @@ void doMove(Board *board, const vec2 source, const vec2 destination)
 
 	bool diagonal = !((direction.x == 0) || (direction.y == 0));
 	Tile *sourceTile = board->getTileAt(source);
+
+	if(sourceTile->getType() != currentTurn)
+	{
+		return;
+	}
+
 	if(!sourceTile->getIsBlack() && diagonal)
 	{
 		//This move is not valid because it does diagonal on not black
@@ -70,6 +78,10 @@ void doMove(Board *board, const vec2 source, const vec2 destination)
 		const vec2 oppositeDirection({-direction.x, -direction.y});
 		propagateMoveInDirection(board, sourceTile->getType(), source, oppositeDirection);
 	}
+
+	currentTurn = currentTurn == GREEN?RED:GREEN;
+	std::cout << "Current turn is now " << (currentTurn == GREEN?"green":"red") << std::endl;
+
 	const vec2 newPosition = source + direction;
 
 	//This swaps the tiles, which swaps the color and position
@@ -189,6 +201,8 @@ void iniGame(HWND windowHandle)
 	DrawableBoard *drawableBoard = new DrawableBoard(board, boardPosition);
 
 	boardRenderer = new WindowsBoardRenderer(drawableBoard, windowHandle);
+
+	std::cout << "Current turn is now " << (currentTurn == GREEN?"green":"red") << std::endl;
 }
 
 void runWindowMessageLoop(HWND windowHandle)
