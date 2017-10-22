@@ -13,6 +13,37 @@ Tile *selectedTile = nullptr;
 
 TileType currentTurn = GREEN;
 
+bool checkForWin(Board *board)
+{
+	bool hasRed = false;
+	bool hasGreen = false;
+
+	for(int y = 0; y < board->getDimension().height; y++)
+	{
+		for (int x = 0; x < board->getDimension().width; x++)
+		{
+			Tile *tile = board->getTileAt({x, y});
+			if (tile->getType() == RED)
+			{
+				hasRed = true;
+			} else if (tile->getType() == GREEN)
+			{
+				hasGreen = true;
+			}
+
+			if (hasGreen && hasRed)
+			{
+				return false;
+			}
+		}
+	}
+	if(!hasGreen || !hasRed)
+	{
+		return true;
+	}
+	return false;
+}
+
 /*
  * TODO All the code related to moving needs to be pulled out
  * Since it does not belong in the main game class
@@ -77,6 +108,10 @@ void doMove(Board *board, const vec2 source, const vec2 destination)
 	{
 		const vec2 oppositeDirection({-direction.x, -direction.y});
 		propagateMoveInDirection(board, sourceTile->getType(), source, oppositeDirection);
+	}
+	if(checkForWin(board))
+	{
+		std::cout << (currentTurn == GREEN?"green":"red") << " has won!" <<  std::endl;
 	}
 
 	currentTurn = currentTurn == GREEN?RED:GREEN;
