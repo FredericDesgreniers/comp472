@@ -1,27 +1,22 @@
 
 #include "BoardRenderer.h"
 
-BoardRenderer::BoardRenderer(DrawableBoard *drawableBoard): drawableBoard(drawableBoard)
+BoardRenderer::BoardRenderer(TileType*tilesToDraw, vec2 tileBoardDimension): tilesToDraw(tilesToDraw), tileBoardDimension(tileBoardDimension), pixelDimension(tileDimension.width * tileBoardDimension.width, tileDimension.height * tileBoardDimension.height)
 {
-
+	pixelDimension = {tileDimension.width * tileBoardDimension.width, tileDimension.height * tileBoardDimension.height};
 }
 
 void BoardRenderer::render()
 {
 	renderStart();
 
-	Board* boardToRender = drawableBoard->getBoard();
-
-	const vec2 boardDimension = boardToRender->getDimension();
-
 	drawBackground();
-	for(int yPos = 0; yPos < boardDimension.height; yPos++)
+	for(int yPos = 0; yPos < tileBoardDimension.height; yPos++)
 	{
-		for(int xPos = 0; xPos < boardDimension.width; xPos++)
+		for(int xPos = 0; xPos < tileBoardDimension.width; xPos++)
 		{
-			vec2 tilePosition = {xPos, yPos};
-			Tile *tileToDraw = boardToRender->getTileAt(tilePosition);
-			drawTile(tileToDraw);
+			TileType typeToDraw = tilesToDraw[yPos * tileBoardDimension.width + xPos];
+			drawTile({xPos, yPos}, typeToDraw);
 		}
 	}
 

@@ -11,20 +11,20 @@ class WindowsBoardRenderer: public BoardRenderer
 	HBITMAP bmp;
 	HBITMAP bmpold;
 
-	char* getRenderCharAndSetColor(const Tile *tile);
+	char* getRenderCharAndSetColor(const TileType type);
 
-	COLORREF getTileBackgroundColor(const Tile *tile, bool isHovering);
+	COLORREF getTileBackgroundColor(const vec2 position, bool isHovering);
 
 	const vec2 getCursorPosition();
 
 	bool isCursorHovering(const vec2 tilePosition);
 
-	void drawTileBackground(const Tile* tile, const vec2 tilePositionTopLeft);
+	void drawTileBackground(const TileType tile,vec2 tileBoardPosition, const vec2 tilePositionTopLeft);
 
-	void drawTileCharacter(const Tile* tile, const vec2 tilePositionTopLeft);
+	void drawTileCharacter(const TileType tile, const vec2 tilePositionTopLeft);
 
 protected:
-	void drawTile(Tile *tile) override;
+	void drawTile(vec2 position, TileType  type) override;
 
 	void drawBackground() override;
 
@@ -32,8 +32,7 @@ protected:
 	void renderEnd() override;
 
 public:
-	WindowsBoardRenderer(DrawableBoard *drawableBoard, HWND handleTarget);
-	Tile* getTileAtDisplayCoordinates(const vec2 position) override;
+	WindowsBoardRenderer(TileType* tilesToDraw, vec2 dimension, HWND handleTarget);
 
 	const vec2 getTilePositionFromDisplayPosition(const vec2 position) override;
 

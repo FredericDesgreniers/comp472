@@ -1,11 +1,14 @@
 #pragma once
-#include "Board.h"
-#include "DrawableBoard.h"
+
+#include "GameMemory.h"
 
 class BoardRenderer
 {
 protected:
-	DrawableBoard *drawableBoard;
+	TileType* tilesToDraw;
+	vec2 tileBoardDimension;
+	vec2 pixelDimension = {0, 0};
+	vec2 tileDimension = {50,50};
 
 	virtual void renderStart()
 	{
@@ -17,7 +20,7 @@ protected:
 
 	}
 
-	virtual void drawTile(Tile* tile)
+	virtual void drawTile(vec2 position, TileType  type)
 	{
 
 	}
@@ -29,21 +32,15 @@ protected:
 
 
 public:
-	BoardRenderer(DrawableBoard *drawableBoard);
+	BoardRenderer(TileType* tilesToDraw, vec2 tileBoardDimension);
 
 	void render();
 
-	virtual Tile* getTileAtDisplayCoordinates(const vec2 position)
-	{
-		return nullptr;
-	}
 
 	virtual const vec2 getTilePositionFromDisplayPosition(const vec2 position)
 	{
 		return {-1, -1};
 	}
-
-	DrawableBoard *getDrawableBoard(){return drawableBoard;};
 };
 
 

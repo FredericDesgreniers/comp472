@@ -2,8 +2,7 @@
 #include <iostream>
 #include "WindowsBoardRenderer.h"
 
-WindowsBoardRenderer::WindowsBoardRenderer(DrawableBoard *drawableBoard, HWND handleTarget):BoardRenderer
-		                                                                                            (drawableBoard), handleTarget(handleTarget)
+WindowsBoardRenderer::WindowsBoardRenderer(TileType *tilesToDraw, vec2 dimension, HWND handleTarget):BoardRenderer(tilesToDraw, dimension), handleTarget(handleTarget)
 {
 	dcTarget = GetDC(handleTarget);
 
@@ -15,31 +14,31 @@ void WindowsBoardRenderer::renderStart()
 {
 	dcBufferTarget = CreateCompatibleDC(NULL);
 
-	const vec2 boardDimensionIncludingBorder = drawableBoard->getPixelDimension() + (getDrawableBoard()->getBorderWeight() * 2);
+	const vec2 boardDimensionIncludingBorder = pixelDimension;
 
 	bmp = CreateCompatibleBitmap( getTargetDC(), boardDimensionIncludingBorder.width,
 	                              boardDimensionIncludingBorder.height);
 	bmpold = (HBITMAP)SelectObject(dcBufferTarget, bmp);
 }
 
-void WindowsBoardRenderer::drawTile(Tile *tile)
+void WindowsBoardRenderer::drawTile(vec2 position, TileType  tileType)
 {
-	const vec2 tilePosition = (tile->getPosition() * drawableBoard->getTileDimension()) + drawableBoard->getBorderWeight();
+	const vec2 tilePosition = (position * tileDimension);
 
-	drawTileBackground(tile, tilePosition);
+	drawTileBackground(tileType, position, tilePosition);
 
-	drawTileCharacter(tile, tilePosition);
+	drawTileCharacter(tileType, tilePosition);
 }
 
 
-void WindowsBoardRenderer::drawTileBackground(const Tile *tile, const vec2 tilePositionTopLeft)
+void WindowsBoardRenderer::drawTileBackground(const TileType tileType, vec2 tileBoardPosition, const vec2 tilePositionTopLeft)
 {
-	const COLORREF tileBackgroundColor = getTileBackgroundColor(tile, isCursorHovering(tilePositionTopLeft));
+	const COLORREF tileBackgroundColor = getTileBackgroundColor(tileBoardPosition, isCursorHovering(tilePositionTopLeft));
 
 	const HBRUSH tileBackgroundBrush = CreateSolidBrush(tileBackgroundColor);
 	SelectObject(dcBufferTarget, tileBackgroundBrush);
 
-	const vec2 tilePositionBottomRight = tilePositionTopLeft + drawableBoard->getTileDimension();
+	const vec2 tilePositionBottomRight = tilePositionTopLeft + tileDimension;
 
 	::Rectangle(dcBufferTarget, tilePositionTopLeft.x, tilePositionTopLeft.y, tilePositionBottomRight.x,
 	            tilePositionBottomRight.y);
@@ -49,10 +48,10 @@ void WindowsBoardRenderer::drawTileBackground(const Tile *tile, const vec2 tileP
 
 bool WindowsBoardRenderer::isCursorHovering(const vec2 tilePosition)
 {
-	const vec2 relativeMousePosition = getCursorPosition() - drawableBoard->getPosition();
+	const vec2 relativeMousePosition = getCursorPosition();
 
 	const vec2 &tileTopLeft = tilePosition;
-	const vec2 tileBottomRight = tilePosition + drawableBoard->getTileDimension();
+	const vec2 tileBottomRight = tilePosition + tileDimension;
 
 	bool isHovering = false;
 	if(relativeMousePosition.x > tileTopLeft.x &&
@@ -75,32 +74,33 @@ const vec2 WindowsBoardRenderer::getCursorPosition()
 	return vec2{cursorPosition.x, cursorPosition.y};
 }
 
-COLORREF WindowsBoardRenderer::getTileBackgroundColor(const Tile *tile, bool isHovering)
+COLORREF WindowsBoardRenderer::getTileBackgroundColor(const vec2 position, bool isHovering)
 {
-	if(isHovering || tile->getIsSelected())
+
+	if(isHovering)
 	{
-		return RGB(100,100,100);
+		return RGB(100, 100, 100);
 	}
 	else
-	if(tile->getIsBlack())
+	if(isBlackReferenceBoard[position.y][position.x])
 	{
 		return RGB(0,0,0);
 	}
 	else
 	{
-		return RGB(150,150,150);
+		return RGB(150, 150, 150);
 	}
 
 }
 
-void WindowsBoardRenderer::drawTileCharacter(const Tile *tile, const vec2 tilePositionTopLeft)
+void WindowsBoardRenderer::drawTileCharacter(TileType type, const vec2 tilePositionTopLeft)
 {
-	const vec2 tilePositionBottomRight = tilePositionTopLeft + drawableBoard->getTileDimension();
+	const vec2 tilePositionBottomRight = tilePositionTopLeft + tileDimension;
 
 	RECT tileCharRect = {tilePositionTopLeft.x, tilePositionTopLeft.y, tilePositionBottomRight.x,
 	                     tilePositionBottomRight.y};
 
-	const char* tileChar = getRenderCharAndSetColor(tile);
+	const char* tileChar = getRenderCharAndSetColor(type);
 
 	SelectObject( dcBufferTarget, font );
 
@@ -109,9 +109,9 @@ void WindowsBoardRenderer::drawTileCharacter(const Tile *tile, const vec2 tilePo
 	SetBkMode(dcBufferTarget, OPAQUE);
 }
 
-char *WindowsBoardRenderer::getRenderCharAndSetColor(const Tile *tile)
+char *WindowsBoardRenderer::getRenderCharAndSetColor(TileType type)
 {
-	switch(tile->getType())
+	switch(type)
 	{
 		case EMPTY:
 		{
@@ -137,10 +137,10 @@ char *WindowsBoardRenderer::getRenderCharAndSetColor(const Tile *tile)
 
 void WindowsBoardRenderer::drawBackground()
 {
-	const vec2 boardDimension = drawableBoard->getBoard()->getDimension();
+	const vec2 boardDimension = boardDimension;
 
 	vec2 start = {0, 0};
-	vec2 end = start + (boardDimension * drawableBoard->getTileDimension()) + 2;
+	vec2 end = start + (boardDimension * tileDimension) + 2;
 
 	HPEN pen = CreatePen(PS_SOLID, 2, RGB(0,0,0));
 
@@ -154,29 +154,16 @@ void WindowsBoardRenderer::drawBackground()
 	DeleteObject(pen);
 }
 
-Tile *WindowsBoardRenderer::getTileAtDisplayCoordinates(const vec2 position)
-{
-	vec2 tilePosition = getTilePositionFromDisplayPosition(position);
-
-	if(tilePosition.x >= 0 && tilePosition.y >= 0)
-	{
-		return drawableBoard->getBoard()->getTileAt(tilePosition);
-	}
-
-	return nullptr;
-}
-
-
 const vec2 WindowsBoardRenderer::getTilePositionFromDisplayPosition(const vec2 position)
 {
-	vec2 relativePosition = position - drawableBoard->getPosition();
+	vec2 relativePosition = position;
 
-	const vec2 boardPixelDimension = drawableBoard->getPixelDimension();
+	const vec2 boardPixelDimension = pixelDimension;
 
 	if(relativePosition.x > 0 && relativePosition.x < boardPixelDimension.width
 		&& relativePosition.y > 0 && relativePosition.y < boardPixelDimension.height)
 	{
-		vec2 tilePosition = relativePosition / drawableBoard->getTileDimension();
+		vec2 tilePosition = relativePosition / tileDimension;
 
 		return tilePosition;
 	}
@@ -186,8 +173,8 @@ const vec2 WindowsBoardRenderer::getTilePositionFromDisplayPosition(const vec2 p
 
 void WindowsBoardRenderer::renderEnd()
 {
-	vec2 boardPosition = drawableBoard->getPosition();
-	vec2 boardPixelDimension = drawableBoard->getPixelDimension();
+	vec2 boardPosition = 0;
+	vec2 boardPixelDimension = pixelDimension;
 
 	BitBlt(dcTarget, boardPosition.x, boardPosition.y, boardPixelDimension.width + 2, boardPixelDimension.height + 2,
 	       dcBufferTarget, 0, 0, SRCCOPY);
