@@ -1,6 +1,7 @@
 
 #include <cstring>
 #include <algorithm>
+#include <iostream>
 #include "GameMemory.h"
 
 bool GameMemory::isPositionOnBoard(vec2 position)
@@ -67,18 +68,65 @@ void GameMemory::generateTile(vec2 position)
 	}
 }
 
-std::vector<vec2> GameMemory::doMoveAndReturnKillList(vec2 origin, vec2 destination)
+MoveResult GameMemory::doMove(vec2 origin, vec2 destination)
 {
-	vec2 direction = origin - destination;
+	vec2 direction = destination - origin;
 	vec2 absDirection = direction.getAbs();
+
+	TileType originTile = getTileAt(origin);
+
+	if(originTile != currentTurn)
+	{
+		return {false, std::vector<vec2>()};
+	}
+
 	bool diagonal = absDirection.x == 1 && absDirection.y == 1;
 
 	if(diagonal && !isBlackReferenceBoard[origin.y][origin.x])
 	{
-		return std::vector<vec2>();
+		return MoveResult(false, std::vector<vec2>());
 	}
 
 
+	auto killList = getKillsInDirection(origin+direction, direction);
+	if(killList.size() > 0)
+	{
+		//do at 0
+	}
+	else
+	{
+		killList = getKillsInDirection(origin, -direction);
+	}
 
-	return std::vector<vec2>();
+	for(auto it = killList.begin(); it != killList.end(); it++)
+	{
+		setTileAt(*it, EMPTY);
+	}
+
+	setTileAt(destination, originTile);
+	setTileAt(origin, EMPTY);
+
+	currentTurn = currentTurn == GREEN? RED:GREEN;
+
+	return {true, killList};
+}
+
+std::vector<vec2> GameMemory::getKillsInDirection(const vec2 origin, const vec2 direction)
+{
+	const auto nextTileInDirection = origin + direction;
+	TileType tileType = getTileAt(nextTileInDirection);
+
+	if(tileType == currentTurn || tileType == EMPTY || tileType == INVALID)
+	{
+		return std::vector<vec2>();
+	}
+
+	std::vector<vec2> killList;
+	killList.push_back(nextTileInDirection);
+
+	std::vector<vec2> nextKills = getKillsInDirection(nextTileInDirection, direction);
+
+	killList.insert(std::end(killList), std::begin(nextKills), std::end(nextKills));
+
+	return killList;
 }

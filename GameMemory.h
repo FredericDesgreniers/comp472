@@ -24,6 +24,28 @@ static bool isBlackReferenceBoard[5][9] =
 			1, 0, 1, 0, 1,
 		};
 
+class MoveResult
+{
+	std::vector<vec2> killList;
+	bool valid;
+
+public:
+	MoveResult(bool valid, std::vector<vec2> killList): valid(valid), killList(killList)
+	{
+
+	}
+
+	std::vector<vec2> getKillList() const
+	{
+		return killList;
+	}
+
+	bool isValid() const
+	{
+		return valid;
+	}
+};
+
 class GameMemory
 {
 	TileType tiles[BOARD_HEIGHT][BOARD_WIDTH];
@@ -43,7 +65,13 @@ public:
 
 	void generateTile(vec2 vec2);
 
-	std::vector<vec2> doMoveAndReturnKillList(vec2 origin, vec2 destination);
+	MoveResult doMove(vec2 origin, vec2 destination);
+	std::vector<vec2> getKillsInDirection(const vec2 origin, const vec2 direction);
+
+	TileType getCurrentTurn()
+	{
+		return currentTurn;
+	}
 };
 
 

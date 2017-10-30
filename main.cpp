@@ -48,7 +48,13 @@ void mouseClicked(HWND windowHandle)
 				if(memory.getTileAt(mouseTilePosition) == EMPTY)
 				{
 					std::cout << "move from " << selectedTile.toString() << " to " << mouseTilePosition.toString() << std::endl;
-					memory.doMoveAndReturnKillList(selectedTile, mouseTilePosition);
+					const auto result = memory.doMove(selectedTile, mouseTilePosition);
+
+					if(result.isValid())
+					{
+						std::cout << "Current turn is " << (memory.getCurrentTurn() == GREEN?"GREEN":"RED") << std::endl;
+					}
+
 					selectTile(-1);
 				}
 				else

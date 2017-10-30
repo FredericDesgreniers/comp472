@@ -152,7 +152,7 @@ void WindowsBoardRenderer::drawBackground()
 			        tileBoardDimension.height*tileDimension.height + tileDimension.height
 			};
 	SetBkMode(buffer->getUsableDC(), TRANSPARENT);
-	for(auto numChar = '0'; numChar < '9'; numChar ++)
+	for(auto numChar = '1'; numChar <= '9'; numChar ++)
 	{
 		DrawText(buffer->getUsableDC(), &numChar, 1, &numberPos ,DT_SINGLELINE | DT_CENTER | DT_VCENTER);
 		numberPos.left += tileDimension.width;
@@ -166,7 +166,7 @@ void WindowsBoardRenderer::drawBackground()
 					tileBoardDimension.width * tileDimension.width + tileDimension.width,
 					tileDimension.height
 			};
-	for(auto c = 'a'; c <= 'e'; c++)
+	for(auto c = 'A'; c <= 'E'; c++)
 	{
 		DrawText(buffer->getUsableDC(), &c, 1, &charPos ,DT_SINGLELINE | DT_CENTER | DT_VCENTER);
 		charPos.top += tileDimension.height;
