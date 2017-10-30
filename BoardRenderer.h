@@ -10,6 +10,8 @@ protected:
 	vec2 pixelDimension = {0, 0};
 	vec2 tileDimension = {50,50};
 
+	vec2 selectedTile = -1;
+
 	virtual void renderStart()
 	{
 
@@ -36,6 +38,11 @@ public:
 
 	void render();
 
+
+	void setSelectedTile(vec2 pos)
+	{
+		selectedTile = pos;
+	}
 
 	virtual const vec2 getTilePositionFromDisplayPosition(const vec2 position)
 	{

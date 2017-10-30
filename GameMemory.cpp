@@ -1,5 +1,6 @@
 
 #include <cstring>
+#include <algorithm>
 #include "GameMemory.h"
 
 bool GameMemory::isPositionOnBoard(vec2 position)
@@ -64,4 +65,20 @@ void GameMemory::generateTile(vec2 position)
 		}
 
 	}
+}
+
+std::vector<vec2> GameMemory::doMoveAndReturnKillList(vec2 origin, vec2 destination)
+{
+	vec2 direction = origin - destination;
+	vec2 absDirection = direction.getAbs();
+	bool diagonal = absDirection.x == 1 && absDirection.y == 1;
+
+	if(diagonal && !isBlackReferenceBoard[origin.y][origin.x])
+	{
+		return std::vector<vec2>();
+	}
+
+
+
+	return std::vector<vec2>();
 }

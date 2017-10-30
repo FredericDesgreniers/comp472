@@ -1,5 +1,6 @@
 #pragma once
 
+#include <vector>
 #include "vec2.h"
 
 #define BOARD_WIDTH 9
@@ -41,6 +42,8 @@ public:
 	}
 
 	void generateTile(vec2 vec2);
+
+	std::vector<vec2> doMoveAndReturnKillList(vec2 origin, vec2 destination);
 };
 
 

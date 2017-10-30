@@ -2,23 +2,14 @@
 #include <iostream>
 #include "WindowsBoardRenderer.h"
 
-WindowsBoardRenderer::WindowsBoardRenderer(TileType *tilesToDraw, vec2 dimension, HWND handleTarget):BoardRenderer(tilesToDraw, dimension), handleTarget(handleTarget)
+WindowsBoardRenderer::WindowsBoardRenderer(TileType *tilesToDraw, vec2 dimension, DoubleBuffer *buffer):BoardRenderer(tilesToDraw, dimension), buffer(buffer)
 {
-	dcTarget = GetDC(handleTarget);
-
 	font = CreateFont(30, 15, 0, 0, 500, false, false, false, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, "Arial");
-
 }
 
 void WindowsBoardRenderer::renderStart()
 {
-	dcBufferTarget = CreateCompatibleDC(NULL);
-
-	const vec2 boardDimensionIncludingBorder = pixelDimension;
-
-	bmp = CreateCompatibleBitmap( getTargetDC(), boardDimensionIncludingBorder.width,
-	                              boardDimensionIncludingBorder.height);
-	bmpold = (HBITMAP)SelectObject(dcBufferTarget, bmp);
+	buffer->allocateBuffer();
 }
 
 void WindowsBoardRenderer::drawTile(vec2 position, TileType  tileType)
@@ -36,11 +27,11 @@ void WindowsBoardRenderer::drawTileBackground(const TileType tileType, vec2 tile
 	const COLORREF tileBackgroundColor = getTileBackgroundColor(tileBoardPosition, isCursorHovering(tilePositionTopLeft));
 
 	const HBRUSH tileBackgroundBrush = CreateSolidBrush(tileBackgroundColor);
-	SelectObject(dcBufferTarget, tileBackgroundBrush);
+	SelectObject(buffer->getUsableDC(), tileBackgroundBrush);
 
 	const vec2 tilePositionBottomRight = tilePositionTopLeft + tileDimension;
 
-	::Rectangle(dcBufferTarget, tilePositionTopLeft.x, tilePositionTopLeft.y, tilePositionBottomRight.x,
+	::Rectangle(buffer->getUsableDC(), tilePositionTopLeft.x, tilePositionTopLeft.y, tilePositionBottomRight.x,
 	            tilePositionBottomRight.y);
 
 	DeleteObject(tileBackgroundBrush);
@@ -69,7 +60,7 @@ const vec2 WindowsBoardRenderer::getCursorPosition()
 {
 	POINT cursorPosition;
 	GetCursorPos(&cursorPosition);
-	ScreenToClient(handleTarget, &cursorPosition);
+	ScreenToClient(buffer->getHandle(), &cursorPosition);
 
 	return vec2{cursorPosition.x, cursorPosition.y};
 }
@@ -77,7 +68,7 @@ const vec2 WindowsBoardRenderer::getCursorPosition()
 COLORREF WindowsBoardRenderer::getTileBackgroundColor(const vec2 position, bool isHovering)
 {
 
-	if(isHovering)
+	if(isHovering || selectedTile == position)
 	{
 		return RGB(100, 100, 100);
 	}
@@ -102,11 +93,11 @@ void WindowsBoardRenderer::drawTileCharacter(TileType type, const vec2 tilePosit
 
 	const char* tileChar = getRenderCharAndSetColor(type);
 
-	SelectObject( dcBufferTarget, font );
+	SelectObject( buffer->getUsableDC(), font );
 
-	SetBkMode(dcBufferTarget, TRANSPARENT);
-	DrawText(dcBufferTarget, tileChar, 1, &tileCharRect, DT_SINGLELINE | DT_CENTER | DT_VCENTER);
-	SetBkMode(dcBufferTarget, OPAQUE);
+	SetBkMode(buffer->getUsableDC(), TRANSPARENT);
+	DrawText(buffer->getUsableDC(), tileChar, 1, &tileCharRect, DT_SINGLELINE | DT_CENTER | DT_VCENTER);
+	SetBkMode(buffer->getUsableDC(), OPAQUE);
 }
 
 char *WindowsBoardRenderer::getRenderCharAndSetColor(TileType type)
@@ -119,12 +110,12 @@ char *WindowsBoardRenderer::getRenderCharAndSetColor(TileType type)
 		};
 		case RED:
 		{
-			SetTextColor(dcBufferTarget, RGB(255, 0, 0));
+			SetTextColor(buffer->getUsableDC(), RGB(255, 0, 0));
 			return "R";
 		};
 		case GREEN:
 		{
-			SetTextColor(dcBufferTarget, RGB(0, 255, 0));
+			SetTextColor(buffer->getUsableDC(), RGB(0, 255, 0));
 			return "G";
 		};
 
@@ -144,14 +135,45 @@ void WindowsBoardRenderer::drawBackground()
 
 	HPEN pen = CreatePen(PS_SOLID, 2, RGB(0,0,0));
 
-	SelectObject(dcBufferTarget, pen);
+	SelectObject(buffer->getUsableDC(), pen);
 
-	MoveToEx(dcBufferTarget, start.x, start.y, (LPPOINT)NULL);
-	LineTo(dcBufferTarget, start.x, end.y);
-	LineTo(dcBufferTarget, end.x, end.y);
-	LineTo(dcBufferTarget, end.x, start.y);
-	LineTo(dcBufferTarget, start.x, start.y);
+	MoveToEx(buffer->getUsableDC(), start.x, start.y, (LPPOINT)NULL);
+	LineTo(buffer->getUsableDC(), start.x, end.y);
+	LineTo(buffer->getUsableDC(), end.x, end.y);
+	LineTo(buffer->getUsableDC(), end.x, start.y);
+	LineTo(buffer->getUsableDC(), start.x, start.y);
 	DeleteObject(pen);
+	SelectObject( buffer->getUsableDC(), font );
+	RECT numberPos =
+			{
+					0,
+			        tileBoardDimension.height*tileDimension.height,
+			        tileDimension.width,
+			        tileBoardDimension.height*tileDimension.height + tileDimension.height
+			};
+	SetBkMode(buffer->getUsableDC(), TRANSPARENT);
+	for(auto numChar = '0'; numChar < '9'; numChar ++)
+	{
+		DrawText(buffer->getUsableDC(), &numChar, 1, &numberPos ,DT_SINGLELINE | DT_CENTER | DT_VCENTER);
+		numberPos.left += tileDimension.width;
+		numberPos.right += tileDimension.width;
+	}
+
+	RECT charPos =
+			{
+					tileBoardDimension.width * tileDimension.width,
+					0,
+					tileBoardDimension.width * tileDimension.width + tileDimension.width,
+					tileDimension.height
+			};
+	for(auto c = 'a'; c <= 'e'; c++)
+	{
+		DrawText(buffer->getUsableDC(), &c, 1, &charPos ,DT_SINGLELINE | DT_CENTER | DT_VCENTER);
+		charPos.top += tileDimension.height;
+		charPos.bottom += tileDimension.height;
+	}
+	SetBkMode(buffer->getUsableDC(), OPAQUE);
+
 }
 
 const vec2 WindowsBoardRenderer::getTilePositionFromDisplayPosition(const vec2 position)
@@ -173,17 +195,9 @@ const vec2 WindowsBoardRenderer::getTilePositionFromDisplayPosition(const vec2 p
 
 void WindowsBoardRenderer::renderEnd()
 {
-	vec2 boardPosition = 0;
-	vec2 boardPixelDimension = pixelDimension;
-
-	BitBlt(dcTarget, boardPosition.x, boardPosition.y, boardPixelDimension.width + 2, boardPixelDimension.height + 2,
-	       dcBufferTarget, 0, 0, SRCCOPY);
+	buffer->swapBuffers();
 
 	BoardRenderer::renderEnd();
-
-	SelectObject(dcBufferTarget, bmpold);
-	DeleteObject(bmp);
-	DeleteObject(dcBufferTarget);
 }
 
 

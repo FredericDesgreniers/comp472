@@ -1,15 +1,14 @@
 #pragma once
 #include "BoardRenderer.h"
+#include "DoubleBuffer.h"
 #include <windows.h>
+#include <memory>
 
 class WindowsBoardRenderer: public BoardRenderer
 {
-	HWND handleTarget;
-	HDC dcTarget;
-	HDC dcBufferTarget;
+	DoubleBuffer *buffer;
+
 	HFONT font;
-	HBITMAP bmp;
-	HBITMAP bmpold;
 
 	char* getRenderCharAndSetColor(const TileType type);
 
@@ -32,11 +31,9 @@ protected:
 	void renderEnd() override;
 
 public:
-	WindowsBoardRenderer(TileType* tilesToDraw, vec2 dimension, HWND handleTarget);
+	WindowsBoardRenderer(TileType* tilesToDraw, vec2 dimension, DoubleBuffer *buffer);
 
 	const vec2 getTilePositionFromDisplayPosition(const vec2 position) override;
-
-	HDC getTargetDC(){return dcTarget;};
 };
 
 

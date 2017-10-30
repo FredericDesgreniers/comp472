@@ -8,6 +8,79 @@ bool wasMousePressed = false;
 vec2 *selectedTilePosition = nullptr;
 BoardRenderer* boardRenderer;
 
+vec2 selectedTile = -1;
+
+GameMemory memory;
+
+vec2 getCursorPos(HWND hwnd)
+{
+	POINT cursorPos;
+	GetCursorPos(&cursorPos);
+	ScreenToClient(hwnd, &cursorPos);
+	return {cursorPos.x, cursorPos.y};
+}
+
+void selectTile(vec2 tilePosition)
+{
+	selectedTile = tilePosition;
+	if(selectedTile.isPositive())
+	{
+		std::cout << "Selected " << selectedTile.toString() << std::endl;
+	}
+	boardRenderer->setSelectedTile(selectedTile);
+}
+
+void mouseClicked(HWND windowHandle)
+{
+	const auto cursorPos = getCursorPos(windowHandle);
+	const auto mouseTilePosition = boardRenderer->getTilePositionFromDisplayPosition(cursorPos);
+
+	if(mouseTilePosition.isPositive())
+	{
+		if(selectedTile.isPositive())
+		{
+			auto directionVector = selectedTile - mouseTilePosition;
+
+			auto absDirectionVector = directionVector.getAbs();
+
+			if(absDirectionVector.x <= 1 && absDirectionVector.y <= 1)
+			{
+				if(memory.getTileAt(mouseTilePosition) == EMPTY)
+				{
+					std::cout << "move from " << selectedTile.toString() << " to " << mouseTilePosition.toString() << std::endl;
+					memory.doMoveAndReturnKillList(selectedTile, mouseTilePosition);
+					selectTile(-1);
+				}
+				else
+				{
+					if(memory.getTileAt(mouseTilePosition) != EMPTY)
+						selectTile(mouseTilePosition);
+					else
+						selectTile(-1);
+				}
+			}
+			else
+			{
+				if(memory.getTileAt(mouseTilePosition) != EMPTY)
+					selectTile(mouseTilePosition);
+				else
+					selectTile(-1);
+			}
+		}
+		else
+		{
+			if(memory.getTileAt(mouseTilePosition) != EMPTY)
+				selectTile(mouseTilePosition);
+			else
+				selectTile(-1);
+		}
+	}
+	else
+	{
+		selectTile(-1);
+	}
+}
+
 /**
  * TODO All the code relating to the Windows api should be pulled out
  * Would make it simpler to change to an api like SDL later
@@ -23,7 +96,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		{
 
 				if(boardRenderer != nullptr)
-			boardRenderer->render();
+					boardRenderer->render();
 		}break;
 
 		case WM_CLOSE:
@@ -37,7 +110,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			if (!wasMousePressed)
 			{
 				wasMousePressed = true;
-				//onClick(boardRenderer, hwnd);
+				mouseClicked(hwnd);
 			}
 		}break;
 
@@ -115,9 +188,11 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
 	ShowWindow(windowHandle, true);
 
-	GameMemory memory;
 
-	boardRenderer = new WindowsBoardRenderer(memory.getTileArray(), {9, 5}, windowHandle);
+
+	std::unique_ptr<DoubleBuffer> buffer(new DoubleBuffer(windowHandle));
+
+	boardRenderer = new WindowsBoardRenderer(memory.getTileArray(), {9, 5}, buffer.get());
 	//iniGame(windowHandle);
 
 	runWindowMessageLoop(windowHandle);

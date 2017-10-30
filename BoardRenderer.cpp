@@ -1,7 +1,7 @@
 
 #include "BoardRenderer.h"
 
-BoardRenderer::BoardRenderer(TileType*tilesToDraw, vec2 tileBoardDimension): tilesToDraw(tilesToDraw), tileBoardDimension(tileBoardDimension), pixelDimension(tileDimension.width * tileBoardDimension.width, tileDimension.height * tileBoardDimension.height)
+BoardRenderer::BoardRenderer(TileType* tilesToDraw, vec2 tileBoardDimension): tilesToDraw(tilesToDraw), tileBoardDimension(tileBoardDimension), pixelDimension(tileDimension.width * tileBoardDimension.width, tileDimension.height * tileBoardDimension.height)
 {
 	pixelDimension = {tileDimension.width * tileBoardDimension.width, tileDimension.height * tileBoardDimension.height};
 }
