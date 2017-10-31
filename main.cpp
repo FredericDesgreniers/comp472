@@ -5,7 +5,6 @@
 #include "WindowsBoardRenderer.h"
 
 bool wasMousePressed = false;
-vec2 *selectedTilePosition = nullptr;
 BoardRenderer* boardRenderer;
 
 vec2 selectedTile = -1;
@@ -193,12 +192,9 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
 	ShowWindow(windowHandle, true);
 
-
-
 	std::unique_ptr<DoubleBuffer> buffer(new DoubleBuffer(windowHandle));
 
 	boardRenderer = new WindowsBoardRenderer(memory.getTileArray(), {9, 5}, buffer.get());
-	//iniGame(windowHandle);
 
 	runWindowMessageLoop(windowHandle);
 
