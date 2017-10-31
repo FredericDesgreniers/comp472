@@ -50,6 +50,8 @@ class GameMemory
 {
 	TileType tiles[BOARD_HEIGHT][BOARD_WIDTH];
 	TileType currentTurn = GREEN;
+	std::vector<vec2> greenPositions;
+	std::vector<vec2> redPositions;
 
 public:
 	GameMemory();
@@ -67,6 +69,8 @@ public:
 
 	MoveResult doMove(vec2 origin, vec2 destination);
 	std::vector<vec2> getKillsInDirection(const vec2 origin, const vec2 direction);
+
+	void nextTurn();
 
 	TileType getCurrentTurn()
 	{

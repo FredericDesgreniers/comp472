@@ -11,6 +11,7 @@ void BoardRenderer::render()
 	renderStart();
 
 	drawBackground();
+
 	for(int yPos = 0; yPos < tileBoardDimension.height; yPos++)
 	{
 		for(int xPos = 0; xPos < tileBoardDimension.width; xPos++)

@@ -23,6 +23,30 @@ void GameMemory::setTileAt(vec2 position, TileType type)
 {
 	if(isPositionOnBoard(position))
 	{
+		switch(tiles[position.y][position.x])
+		{
+			case GREEN:
+			{
+				greenPositions.erase(remove_if(greenPositions.begin(), greenPositions.end(), [position](auto value){return value == position;}));
+			}break;
+			case RED:
+			{
+				redPositions.erase(std::remove_if(redPositions.begin(), redPositions.end(), [position](auto value){return value == position;}));
+			}break;
+		}
+
+		switch(type)
+		{
+			case GREEN:
+			{
+				greenPositions.push_back(position);
+			}break;
+			case RED:
+			{
+				redPositions.push_back(position);
+			}break;
+		}
+
 		tiles[position.y][position.x] = type;
 	}
 }
@@ -38,6 +62,8 @@ GameMemory::GameMemory()
 			generateTile(vec2{xIndex, yIndex});
 		}
 	}
+
+	std::cout << "Currently "<<redPositions.size() << " red and " << greenPositions.size() << " green "<< std::endl;
 }
 
 void GameMemory::generateTile(vec2 position)
@@ -98,15 +124,13 @@ MoveResult GameMemory::doMove(vec2 origin, vec2 destination)
 		killList = getKillsInDirection(origin, -direction);
 	}
 
-	for(auto it = killList.begin(); it != killList.end(); it++)
+	for(auto &killPosition : killList)
 	{
-		setTileAt(*it, EMPTY);
+		setTileAt(killPosition, EMPTY);
 	}
 
 	setTileAt(destination, originTile);
 	setTileAt(origin, EMPTY);
-
-	currentTurn = currentTurn == GREEN? RED:GREEN;
 
 	return {true, killList};
 }
@@ -129,4 +153,12 @@ std::vector<vec2> GameMemory::getKillsInDirection(const vec2 origin, const vec2 
 	killList.insert(std::end(killList), std::begin(nextKills), std::end(nextKills));
 
 	return killList;
+}
+
+void GameMemory::nextTurn()
+{
+	currentTurn = currentTurn == GREEN? RED:GREEN;
+	std::cout << "Current turn is " << (currentTurn == GREEN?"GREEN":"RED") << std::endl;
+
+	std::cout << "Currently "<<redPositions.size() << " red and " << greenPositions.size() << " green "<< std::endl;
 }

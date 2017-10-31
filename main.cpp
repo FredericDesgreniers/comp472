@@ -23,11 +23,20 @@ vec2 getCursorPos(HWND hwnd)
 void selectTile(vec2 tilePosition)
 {
 	selectedTile = tilePosition;
-	if(selectedTile.isPositive())
-	{
-		std::cout << "Selected " << selectedTile.toString() << std::endl;
-	}
 	boardRenderer->setSelectedTile(selectedTile);
+}
+
+void selectTileIfNotEmpty(vec2 tilePosition)
+{
+	TileType type = memory.getTileAt(tilePosition);
+	if(type != EMPTY && type != INVALID)
+	{
+		selectTile(tilePosition);
+	}
+	else
+	{
+		selectTile(-1);
+	}
 }
 
 void mouseClicked(HWND windowHandle)
@@ -47,38 +56,28 @@ void mouseClicked(HWND windowHandle)
 			{
 				if(memory.getTileAt(mouseTilePosition) == EMPTY)
 				{
-					std::cout << "move from " << selectedTile.toString() << " to " << mouseTilePosition.toString() << std::endl;
 					const auto result = memory.doMove(selectedTile, mouseTilePosition);
 
 					if(result.isValid())
 					{
-						std::cout << "Current turn is " << (memory.getCurrentTurn() == GREEN?"GREEN":"RED") << std::endl;
+						memory.nextTurn();
 					}
 
 					selectTile(-1);
 				}
 				else
 				{
-					if(memory.getTileAt(mouseTilePosition) != EMPTY)
-						selectTile(mouseTilePosition);
-					else
-						selectTile(-1);
+					selectTileIfNotEmpty(mouseTilePosition);
 				}
 			}
 			else
 			{
-				if(memory.getTileAt(mouseTilePosition) != EMPTY)
-					selectTile(mouseTilePosition);
-				else
-					selectTile(-1);
+				selectTileIfNotEmpty(mouseTilePosition);
 			}
 		}
 		else
 		{
-			if(memory.getTileAt(mouseTilePosition) != EMPTY)
-				selectTile(mouseTilePosition);
-			else
-				selectTile(-1);
+			selectTileIfNotEmpty(mouseTilePosition);
 		}
 	}
 	else
