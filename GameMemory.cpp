@@ -53,7 +53,7 @@ void GameMemory::setTileAt(vec2 position, TileType type)
 
 GameMemory::GameMemory()
 {
-	memset(tiles, getArea({9, 5}), 1);
+	memset(tiles, vec2{9, 5}.getArea(), 1);
 
 	for(int yIndex = 0; yIndex < 5; yIndex++)
 	{
@@ -113,13 +113,9 @@ MoveResult GameMemory::doMove(vec2 origin, vec2 destination)
 		return MoveResult(false, std::vector<vec2>());
 	}
 
-
 	auto killList = getKillsInDirection(origin+direction, direction);
-	if(killList.size() > 0)
-	{
-		//do at 0
-	}
-	else
+
+	if(killList.size() == 0)
 	{
 		killList = getKillsInDirection(origin, -direction);
 	}

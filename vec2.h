@@ -40,18 +40,18 @@ struct vec2{
 	{
 		return "{ "+std::to_string(x)+", "+std::to_string(y)+" }";
 	}
+
+	int getDistanceSquared()
+	{
+		return (x * x) + (y * y);
+	}
+
+	int getArea()
+	{
+		return x * y;
+	}
 };
 
-
-inline int getDistanceSquared(const vec2 vector)
-{
-	return (vector.x * vector.x) + (vector.y * vector.y);
-}
-
-inline int getArea(const vec2 dimension)
-{
-	return dimension.x * dimension.y;
-}
 
 inline bool operator==(const vec2 &left, const vec2 &right)
 {
