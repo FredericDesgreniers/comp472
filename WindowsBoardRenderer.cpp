@@ -128,7 +128,7 @@ char *WindowsBoardRenderer::getRenderCharAndSetColor(TileType type)
 
 void WindowsBoardRenderer::drawBackground()
 {
-	const vec2 boardDimension = boardDimension;
+	const vec2 boardDimension = tileBoardDimension * tileDimension;
 
 	vec2 start = {0, 0};
 	vec2 end = start + (boardDimension * tileDimension) + 2;
