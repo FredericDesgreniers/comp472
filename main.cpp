@@ -10,6 +10,8 @@ BoardRenderer* boardRenderer;
 
 vec2 selectedTile = -1;
 
+tileType chosenStartingColor;
+
 GameMemory memory;
 
 vec2 getCursorPos(HWND hwnd)
@@ -37,6 +39,30 @@ void selectTileIfNotEmpty(vec2 tilePosition)
 	{
 		selectTile(-1);
 	}
+}
+
+int DisplayConfirmChooseColorAsMessageBox()
+{
+	int msgboxID = MessageBox(
+		NULL,
+		"Would you like to start as Green?",
+		"Starting Color",
+		MB_ICONEXCLAMATION | MB_YESNO
+	);
+
+	if (msgboxID == IDYES)
+	{
+		MessageBox(NULL, "You are now Green", "Starting Color", MB_ICONINFORMATION | MB_OK);
+		chosenStartingColor = GREEN;
+		// TODO: add code
+	}
+	else if (msgboxID == IDNO)
+	{
+		MessageBox(NULL, "You are now Red", "Starting Color", MB_ICONINFORMATION | MB_OK);
+		chosenStartingColor = RED;
+	}
+
+	return msgboxID;
 }
 
 void mouseClicked(HWND windowHandle)
@@ -159,6 +185,8 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	windowClass.hbrBackground = (HBRUSH) (COLOR_WINDOW + 1);
 	windowClass.lpszMenuName = NULL;
 	windowClass.lpszClassName = "game_test_123";
+
+	DisplayConfirmChooseColorAsMessageBox();
 
 	if (!RegisterClass(&windowClass))
 	{
