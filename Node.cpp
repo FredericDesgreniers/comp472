@@ -4,12 +4,20 @@
 
 #include "Node.h"
 
-Node::Node(GameMemory memory, int depth): memory(memory), depth(depth)
+Node::Node(Node *parent, GameMemory memory, MoveInfo moveInfo, bool isMax, int depth): parent(parent), memory(memory)
+		, moveInfo(moveInfo), isMax(isMax), depth(depth)
 {
-	calculateHeuristic();
+	if(depth == 3)
+	{
+		calculateHeuristic();
+	}
+
 	if (depth < 3)
 	{
 		findNextMoves();
+		auto bestNode = getBestNode();
+		heuristic = bestNode->heuristic;
+		bestMove = bestNode->moveInfo;
 	}
 }
 
@@ -78,6 +86,43 @@ void Node::tryMove(vec2 position, vec2 direction)
 	GameMemory newMemory = memory;
 	if(memory.doMove(position, position + direction).isValid())
 	{
-		children.push_back(Node(newMemory, depth+1));
+		children.push_back(Node(this, newMemory, {position, position+direction}, !isMax, depth+1));
 	}
+}
+
+Node *Node::getBestNode()
+{
+
+	Node *bestChild = nullptr;
+	for(auto child : children)
+	{
+		if(bestChild == nullptr)
+		{
+			bestChild = &child;
+		}
+		else
+		{
+			if(isMax)
+			{
+				if (bestChild->getHeuristic() < child.getHeuristic())
+				{
+					bestChild = &child;
+				}
+			}
+			else
+			{
+				if (bestChild->getHeuristic() > child.getHeuristic())
+				{
+					bestChild = &child;
+				}
+			}
+		}
+	}
+
+	return bestChild;
+}
+
+Node::Node(GameMemory memory):Node(nullptr, memory, {0,0}, memory.getCurrentTurn() == GREEN,0)
+{
+
 }

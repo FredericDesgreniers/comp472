@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <iostream>
 #include "GameMemory.h"
+#include "Node.h"
 
 bool GameMemory::isPositionOnBoard(vec2 position)
 {
@@ -64,6 +65,10 @@ GameMemory::GameMemory()
 	}
 
 	std::cout << "Currently "<<redPositions.size() << " red and " << greenPositions.size() << " green "<< std::endl;
+
+	Node node(*this);
+	auto bestMove = node.getBestMove();
+	std::cout << " best move is from " << bestMove.source.toString() << " to " << bestMove.destination.toString();
 }
 
 void GameMemory::generateTile(vec2 position)
@@ -113,6 +118,11 @@ MoveResult GameMemory::doMove(vec2 origin, vec2 destination)
 		return MoveResult(false, std::vector<vec2>());
 	}
 
+	if(getTileAt(destination) != EMPTY)
+	{
+		return MoveResult(false, std::vector<vec2>());
+	}
+
 	auto killList = getKillsInDirection(origin+direction, direction);
 
 	if(killList.size() == 0)
@@ -157,4 +167,9 @@ void GameMemory::nextTurn()
 	std::cout << "Current turn is " << (currentTurn == GREEN?"GREEN":"RED") << std::endl;
 
 	std::cout << "Currently "<<redPositions.size() << " red and " << greenPositions.size() << " green "<< std::endl;
+
+	Node node(*this);
+	auto bestMove = node.getBestMove();
+	std::cout << " best move is from " << bestMove.source.toString() << " to " << bestMove.destination.toString();
+
 }

@@ -197,10 +197,6 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
 	boardRenderer = new WindowsBoardRenderer(memory.getTileArray(), {9, 5}, buffer.get());
 
-	Node node(memory, 0);
-
-	std::cout << node.getHeuristic();
-
 	runWindowMessageLoop(windowHandle);
 
 	return 0;
