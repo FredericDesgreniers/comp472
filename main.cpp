@@ -3,6 +3,7 @@
 #include "GameMemory.h"
 #include "BoardRenderer.h"
 #include "WindowsBoardRenderer.h"
+#include "Node.h"
 
 bool wasMousePressed = false;
 BoardRenderer* boardRenderer;
@@ -195,6 +196,10 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	std::unique_ptr<DoubleBuffer> buffer(new DoubleBuffer(windowHandle));
 
 	boardRenderer = new WindowsBoardRenderer(memory.getTileArray(), {9, 5}, buffer.get());
+
+	Node node(memory, 0);
+
+	std::cout << node.getHeuristic();
 
 	runWindowMessageLoop(windowHandle);
 

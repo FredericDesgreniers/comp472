@@ -76,6 +76,17 @@ public:
 	{
 		return currentTurn;
 	}
+
+	const std::vector<vec2> &getGreenPositions()
+	{
+		return greenPositions;
+	}
+
+	const std::vector<vec2> &getRedPositions()
+	{
+		return redPositions;
+	}
+
 };
 
 
