@@ -187,3 +187,19 @@ void GameMemory::doAiMove()
 
 	nextTurn();
 }
+
+std::vector<vec2> &GameMemory::getCurrentTurnTokenList()
+{
+	switch(getCurrentTurn())
+	{
+		case RED:
+		{
+			return redPositions;
+		}break;
+
+		case GREEN:
+		{
+			return greenPositions;
+		}break;
+	}
+}

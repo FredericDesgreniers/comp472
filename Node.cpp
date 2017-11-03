@@ -54,20 +54,7 @@ void Node::calculateHeuristic()
 
 void Node::findNextMoves()
 {
-	std::vector<vec2> tokenList;
-
-	switch(memory.getCurrentTurn())
-	{
-		case RED:
-		{
-			tokenList = memory.getRedPositions();
-		}break;
-
-		case GREEN:
-		{
-			tokenList = memory.getGreenPositions();
-		}break;
-	}
+	auto &tokenList = memory.getCurrentTurnTokenList();
 
 	for(const auto &token : tokenList)
 	{
@@ -81,7 +68,6 @@ void Node::findNextMoves()
 				}
 			}
 		}
-
 	}
 }
 

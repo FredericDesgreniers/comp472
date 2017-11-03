@@ -101,6 +101,8 @@ public:
 	{
 		return playerType;
 	}
+
+	std::vector<vec2>& getCurrentTurnTokenList();
 };
 
 
