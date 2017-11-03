@@ -27,9 +27,6 @@ Node::Node(Node *parent, GameMemory memory, MoveInfo moveInfo, bool isMax, int d
 
 void Node::calculateHeuristic()
 {
-	heuristic =  memory.getGreenPositions().size() - memory.getRedPositions().size();
-
-	return;
 	int greenHorizontalScore = 0;
 	int greenVerticalScore = 0;
 
