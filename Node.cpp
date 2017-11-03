@@ -5,7 +5,7 @@
 #include <iostream>
 #include "Node.h"
 
-Node::Node(Node *parent, GameMemory memory, MoveInfo moveInfo, bool isMax, int depth): parent(parent), memory(memory)
+Node::Node(Node *parent, GameMemory &memory, MoveInfo moveInfo, bool isMax, int depth): parent(parent), memory(memory)
 		, moveInfo(moveInfo), isMax(isMax), depth(depth)
 {
 
@@ -69,7 +69,7 @@ void Node::findNextMoves()
 		}break;
 	}
 
-	for(const auto token : tokenList)
+	for(const auto &token : tokenList)
 	{
 		for(int dx = -1; dx <= 1; dx++)
 		{

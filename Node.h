@@ -36,7 +36,7 @@ class Node
 	std::vector<Node> children;
 
 public:
-	Node(Node *parent, GameMemory memory, MoveInfo moveInfo, bool isMax, int depth);
+	Node(Node *parent, GameMemory &memory, MoveInfo moveInfo, bool isMax, int depth);
 
 	Node(GameMemory memory);
 
