@@ -52,6 +52,7 @@ class GameMemory
 	TileType currentTurn = GREEN;
 	std::vector<vec2> greenPositions;
 	std::vector<vec2> redPositions;
+	TileType playerType;
 
 public:
 	GameMemory();
@@ -64,6 +65,10 @@ public:
 	{
 		return (TileType *)tiles;
 	}
+
+	void start();
+
+	void doAiMove();
 
 	void generateTile(vec2 vec2);
 
@@ -87,6 +92,15 @@ public:
 		return redPositions;
 	}
 
+	void setPlayerType(TileType playerType)
+	{
+		this->playerType = playerType;
+	}
+
+	TileType getPlayerType()
+	{
+		return playerType;
+	}
 };
 
 

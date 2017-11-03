@@ -10,8 +10,6 @@ BoardRenderer* boardRenderer;
 
 vec2 selectedTile = -1;
 
-tileType chosenStartingColor;
-
 GameMemory memory;
 
 vec2 getCursorPos(HWND hwnd)
@@ -53,13 +51,13 @@ int DisplayConfirmChooseColorAsMessageBox()
 	if (msgboxID == IDYES)
 	{
 		MessageBox(NULL, "You are now Green", "Starting Color", MB_ICONINFORMATION | MB_OK);
-		chosenStartingColor = GREEN;
+		memory.setPlayerType(GREEN);
 		// TODO: add code
 	}
 	else if (msgboxID == IDNO)
 	{
 		MessageBox(NULL, "You are now Red", "Starting Color", MB_ICONINFORMATION | MB_OK);
-		chosenStartingColor = RED;
+		memory.setPlayerType(RED);
 	}
 
 	return msgboxID;
@@ -224,7 +222,7 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	std::unique_ptr<DoubleBuffer> buffer(new DoubleBuffer(windowHandle));
 
 	boardRenderer = new WindowsBoardRenderer(memory.getTileArray(), {9, 5}, buffer.get());
-
+	memory.start();
 	runWindowMessageLoop(windowHandle);
 
 	return 0;

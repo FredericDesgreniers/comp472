@@ -52,6 +52,11 @@ public:
 		return bestMove;
 	}
 
+	MoveInfo getMove()
+	{
+		return moveInfo;
+	}
+
 };
 
 

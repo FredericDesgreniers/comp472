@@ -52,7 +52,7 @@ void GameMemory::setTileAt(vec2 position, TileType type)
 	}
 }
 
-GameMemory::GameMemory()
+GameMemory::GameMemory(): playerType()
 {
 	memset(tiles, vec2{9, 5}.getArea(), 1);
 
@@ -65,10 +65,6 @@ GameMemory::GameMemory()
 	}
 
 	std::cout << "Currently "<<redPositions.size() << " red and " << greenPositions.size() << " green "<< std::endl;
-
-	Node node(*this);
-	auto bestMove = node.getBestMove();
-	std::cout << " best move is from " << bestMove.source.toString() << " to " << bestMove.destination.toString();
 }
 
 void GameMemory::generateTile(vec2 position)
@@ -106,7 +102,7 @@ MoveResult GameMemory::doMove(vec2 origin, vec2 destination)
 
 	TileType originTile = getTileAt(origin);
 
-	if(originTile != currentTurn)
+	if(originTile != currentTurn || originTile == INVALID || originTile ==EMPTY)
 	{
 		return {false, std::vector<vec2>()};
 	}
@@ -168,8 +164,26 @@ void GameMemory::nextTurn()
 
 	std::cout << "Currently "<<redPositions.size() << " red and " << greenPositions.size() << " green "<< std::endl;
 
+	if(playerType != currentTurn)
+	{
+		doAiMove();
+	}
+
+}
+
+void GameMemory::start()
+{
+	if(playerType != currentTurn)
+	{
+		doAiMove();
+	}
+}
+
+void GameMemory::doAiMove()
+{
 	Node node(*this);
 	auto bestMove = node.getBestMove();
-	std::cout << " best move is from " << bestMove.source.toString() << " to " << bestMove.destination.toString();
+	doMove(bestMove.source, bestMove.destination);
 
+	nextTurn();
 }
