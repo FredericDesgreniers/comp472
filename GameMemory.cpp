@@ -5,11 +5,22 @@
 #include "GameMemory.h"
 #include "Node.h"
 
-bool GameMemory::isPositionOnBoard(vec2 position)
+GameMemory::GameMemory(): playerType()
 {
-	return position.x >= 0 && position.x < BOARD_WIDTH &&
-			position.y >= 0 && position.y < BOARD_HEIGHT;
+	memset(tiles, vec2{9, 5}.getArea(), 1);
+
+	for(int yIndex = 0; yIndex < 5; yIndex++)
+	{
+		for(int xIndex = 0; xIndex < 9; xIndex++)
+		{
+			generateTile(vec2{xIndex, yIndex});
+		}
+	}
+
+	std::cout << "Currently "<<redPositions.size() << " red and " << greenPositions.size() << " green "<< std::endl;
 }
+
+
 
 TileType GameMemory::getTileAt(vec2 position)
 {
@@ -52,19 +63,10 @@ void GameMemory::setTileAt(vec2 position, TileType type)
 	}
 }
 
-GameMemory::GameMemory(): playerType()
+bool GameMemory::isPositionOnBoard(vec2 position)
 {
-	memset(tiles, vec2{9, 5}.getArea(), 1);
-
-	for(int yIndex = 0; yIndex < 5; yIndex++)
-	{
-		for(int xIndex = 0; xIndex < 9; xIndex++)
-		{
-			generateTile(vec2{xIndex, yIndex});
-		}
-	}
-
-	std::cout << "Currently "<<redPositions.size() << " red and " << greenPositions.size() << " green "<< std::endl;
+	return position.x >= 0 && position.x < BOARD_WIDTH &&
+	       position.y >= 0 && position.y < BOARD_HEIGHT;
 }
 
 void GameMemory::generateTile(vec2 position)
@@ -98,25 +100,12 @@ void GameMemory::generateTile(vec2 position)
 MoveResult GameMemory::doMove(vec2 origin, vec2 destination)
 {
 	vec2 direction = destination - origin;
-	vec2 absDirection = direction.getAbs();
 
 	TileType originTile = getTileAt(origin);
 
-	if(originTile != currentTurn || originTile == INVALID || originTile ==EMPTY)
+	if(!isValidMove(origin, destination))
 	{
-		return {false, std::vector<vec2>()};
-	}
-
-	bool diagonal = absDirection.x == 1 && absDirection.y == 1;
-
-	if(diagonal && !isBlackReferenceBoard[origin.y][origin.x])
-	{
-		return MoveResult(false, std::vector<vec2>());
-	}
-
-	if(getTileAt(destination) != EMPTY)
-	{
-		return MoveResult(false, std::vector<vec2>());
+		return {false, {}};
 	}
 
 	auto killList = getKillsInDirection(origin+direction, direction);
@@ -136,6 +125,35 @@ MoveResult GameMemory::doMove(vec2 origin, vec2 destination)
 
 	return {true, killList};
 }
+
+bool GameMemory::isValidMove(vec2 origin, vec2 destination)
+{
+	vec2 direction = destination - origin;
+	vec2 absDirection = direction.getAbs();
+
+	TileType originTile = getTileAt(origin);
+
+	if(originTile != currentTurn || originTile == INVALID || originTile ==EMPTY)
+	{
+		return false;
+	}
+
+	bool diagonal = absDirection.x == 1 && absDirection.y == 1;
+
+	if(diagonal && !isBlackReferenceBoard[origin.y][origin.x])
+	{
+		return false;
+	}
+
+	if(getTileAt(destination) != EMPTY)
+	{
+		return false;
+	}
+
+	return true;
+}
+
+
 
 std::vector<vec2> GameMemory::getKillsInDirection(const vec2 origin, const vec2 direction)
 {
@@ -203,3 +221,4 @@ std::vector<vec2> &GameMemory::getCurrentTurnTokenList()
 		}break;
 	}
 }
+

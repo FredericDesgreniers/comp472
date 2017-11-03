@@ -8,13 +8,12 @@
 Node::Node(Node *parent, GameMemory &memory, MoveInfo moveInfo, bool isMax, int depth): parent(parent), memory(memory)
 		, moveInfo(moveInfo), isMax(isMax), depth(depth)
 {
-
-	if(depth == 3)
+	if(depth == maxDepth)
 	{
 		calculateHeuristic();
 	}
 
-	if (depth < 3)
+	if (depth < maxDepth)
 	{
 		findNextMoves();
 		auto bestNode = getBestNode();
@@ -74,11 +73,14 @@ void Node::findNextMoves()
 void Node::tryMove(vec2 position, vec2 direction)
 {
 	auto destination = position + direction;
-	GameMemory newMemory = memory;
-
-	if (newMemory.doMove(position, destination).isValid())
+	if(memory.isValidMove(position, destination))
 	{
-		children.push_back(Node(this, newMemory, {position, destination}, !isMax, depth + 1));
+		GameMemory newMemory = memory;
+
+		if (newMemory.doMove(position, destination).isValid())
+		{
+			children.push_back(Node(this, newMemory, {position, destination}, !isMax, depth + 1));
+		}
 	}
 
 }

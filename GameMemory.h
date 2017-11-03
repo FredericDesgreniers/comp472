@@ -2,6 +2,7 @@
 
 #include <vector>
 #include "vec2.h"
+#include <experimental/optional>
 
 #define BOARD_WIDTH 9
 #define BOARD_HEIGHT 5
@@ -26,7 +27,7 @@ static bool isBlackReferenceBoard[5][9] =
 
 class MoveResult
 {
-	std::vector<vec2> killList;
+	std::experimental::optional<std::vector<vec2>> killList;
 	bool valid;
 
 public:
@@ -35,7 +36,7 @@ public:
 
 	}
 
-	std::vector<vec2> getKillList() const
+	std::experimental::optional<std::vector<vec2>> getKillList() const
 	{
 		return killList;
 	}
@@ -73,6 +74,9 @@ public:
 	void generateTile(vec2 vec2);
 
 	MoveResult doMove(vec2 origin, vec2 destination);
+
+	bool isValidMove(vec2 origin, vec2 destination);
+
 	std::vector<vec2> getKillsInDirection(const vec2 origin, const vec2 direction);
 
 	void nextTurn();
