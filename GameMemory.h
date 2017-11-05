@@ -2,8 +2,6 @@
 
 #include <vector>
 #include "vec2.h"
-#include <experimental/optional>
-
 #define BOARD_WIDTH 9
 #define BOARD_HEIGHT 5
 
@@ -27,7 +25,7 @@ static bool isBlackReferenceBoard[5][9] =
 
 class MoveResult
 {
-	std::experimental::optional<std::vector<vec2>> killList;
+	std::vector<vec2> killList;
 	bool valid;
 
 public:
@@ -36,7 +34,7 @@ public:
 
 	}
 
-	std::experimental::optional<std::vector<vec2>> getKillList() const
+	std::vector<vec2> getKillList() const
 	{
 		return killList;
 	}
