@@ -2,7 +2,7 @@
 
 
 #include "GameMemory.h"
-#define maxDepth 4
+#define maxDepth 3
 
 struct MoveInfo
 {

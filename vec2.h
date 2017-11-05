@@ -26,6 +26,13 @@ struct vec2{
 		y = b;
 	}
 
+	std::basic_string<char> getBoardCoordinates()
+	{
+		char yAsChar = 'A' + y;
+
+		return "{"+std::to_string(x+1)+", "+yAsChar+"}";
+	}
+
 	bool isPositive() const
 	{
 		return x >= 0 && y >= 0;

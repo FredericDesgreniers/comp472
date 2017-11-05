@@ -180,8 +180,6 @@ void GameMemory::nextTurn()
 	currentTurn = currentTurn == GREEN? RED:GREEN;
 	std::cout << "Current turn is " << (currentTurn == GREEN?"GREEN":"RED") << std::endl;
 
-	std::cout << "Currently "<<redPositions.size() << " red and " << greenPositions.size() << " green "<< std::endl;
-
 	if(playerType != currentTurn)
 	{
 		doAiMove();
@@ -202,7 +200,8 @@ void GameMemory::doAiMove()
 	Node node(*this);
 	auto bestMove = node.getBestMove();
 	doMove(bestMove.source, bestMove.destination);
-
+	std::cout << "Moving from " << bestMove.source.getBoardCoordinates() << ", " << bestMove.destination.getBoardCoordinates() << std::endl;
+	std::cout << "h: " << node.getHeuristic() << std::endl;
 	nextTurn();
 }
 
@@ -213,12 +212,12 @@ std::vector<vec2> &GameMemory::getCurrentTurnTokenList()
 		case RED:
 		{
 			return redPositions;
-		}break;
+		}
 
 		case GREEN:
 		{
 			return greenPositions;
-		}break;
+		}
 	}
 }
 
