@@ -177,6 +177,17 @@ std::vector<vec2> GameMemory::getKillsInDirection(const vec2 origin, const vec2 
 
 void GameMemory::nextTurn()
 {
+	if(redPositions.size() == 0)
+	{
+		std::cout << "GREEN WON" << std::endl;
+		return;
+	}
+	if(greenPositions.size() == 0)
+	{
+		std::cout << "RED WON" << std::endl;
+		return;
+	}
+
 	currentTurn = currentTurn == GREEN? RED:GREEN;
 	std::cout << "Current turn is " << (currentTurn == GREEN?"GREEN":"RED") << std::endl;
 
