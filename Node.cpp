@@ -31,7 +31,7 @@ void Node::calculateHeuristic()
 
 	auto &greenTokens = memory.getGreenPositions();
 
-	for(const auto greenToken : memory.getGreenPositions())
+	for(const auto &greenToken : memory.getGreenPositions())
 	{
 		greenHorizontalScore += greenToken.x * greenTokens.size();
 		greenVerticalScore += greenToken.y * greenTokens.size();
@@ -42,7 +42,7 @@ void Node::calculateHeuristic()
 
 	auto &redTokens = memory.getRedPositions();
 
-	for(const auto redToken : redTokens)
+	for(const auto &redToken : redTokens)
 	{
 		redHorizontalScore += redToken.x * redTokens.size();
 		redVerticalScore += redToken.y * redTokens.size();
