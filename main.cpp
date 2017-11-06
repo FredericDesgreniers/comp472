@@ -6,7 +6,7 @@
 #include "Node.h"
 
 bool wasMousePressed = false;
-BoardRenderer* boardRenderer;
+std::unique_ptr<BoardRenderer*> boardRenderer;
 
 vec2 selectedTile = -1;
 
@@ -23,7 +23,7 @@ vec2 getCursorPos(HWND hwnd)
 void selectTile(vec2 tilePosition)
 {
 	selectedTile = tilePosition;
-	boardRenderer->setSelectedTile(selectedTile);
+	(*boardRenderer)->setSelectedTile(selectedTile);
 }
 
 void selectTileIfNotEmpty(vec2 tilePosition)
@@ -63,10 +63,11 @@ int DisplayConfirmChooseColorAsMessageBox()
 	return msgboxID;
 }
 
+//TODO this really needs to get cleaned up
 void mouseClicked(HWND windowHandle)
 {
 	const auto cursorPos = getCursorPos(windowHandle);
-	const auto mouseTilePosition = boardRenderer->getTilePositionFromDisplayPosition(cursorPos);
+	const auto mouseTilePosition = (*boardRenderer)->getTilePositionFromDisplayPosition(cursorPos);
 
 	if(mouseTilePosition.isPositive())
 	{
@@ -125,7 +126,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		{
 
 				if(boardRenderer != nullptr)
-					boardRenderer->render();
+					(*boardRenderer)->render();
 		}break;
 
 		case WM_CLOSE:
@@ -221,7 +222,7 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
 	std::unique_ptr<DoubleBuffer> buffer(new DoubleBuffer(windowHandle));
 
-	boardRenderer = new WindowsBoardRenderer(memory.getTileArray(), {9, 5}, buffer.get());
+	boardRenderer = std::make_unique<BoardRenderer *>(new WindowsBoardRenderer(memory.getTileArray(), {9, 5}, buffer.get()));
 	memory.start();
 	runWindowMessageLoop(windowHandle);
 
