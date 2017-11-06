@@ -114,6 +114,15 @@ MoveResult GameMemory::doMove(vec2 origin, vec2 destination)
 	{
 		killList = getKillsInDirection(origin, -direction);
 	}
+	
+	if (killList.size() > 0)
+	{
+		turnsWithoutAttack = 0;
+	}
+	else
+	{
+		turnsWithoutAttack++;
+	}
 
 	for(auto &killPosition : killList)
 	{
@@ -177,6 +186,7 @@ std::vector<vec2> GameMemory::getKillsInDirection(const vec2 origin, const vec2 
 
 void GameMemory::nextTurn()
 {
+	std::cout << "Turns Without Attack: " << turnsWithoutAttack << std::endl;
 	if(redPositions.size() == 0)
 	{
 		std::cout << "GREEN WON" << std::endl;
@@ -185,6 +195,11 @@ void GameMemory::nextTurn()
 	if(greenPositions.size() == 0)
 	{
 		std::cout << "RED WON" << std::endl;
+		return;
+	}
+	if (turnsWithoutAttack==10)
+	{
+		std::cout << "GAME ENDS IN DRAW" << std::endl;
 		return;
 	}
 

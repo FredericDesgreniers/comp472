@@ -1,0 +1,12 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/comp472/Debug
+/comp472/comp472.vcxproj.user
+/comp472/comp472.vcxproj.filters
+/comp472/comp472.vcxproj
+/comp472/comp472.VC.VC.opendb
+/comp472/comp472.VC.db
+/comp472/comp472.sln
+/comp472/.vs/comp472/v14

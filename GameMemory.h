@@ -52,6 +52,7 @@ class GameMemory
 	std::vector<vec2> greenPositions;
 	std::vector<vec2> redPositions;
 	TileType playerType;
+	int turnsWithoutAttack = 0;
 
 public:
 	GameMemory();

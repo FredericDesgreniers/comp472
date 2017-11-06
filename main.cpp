@@ -169,6 +169,12 @@ void runWindowMessageLoop(HWND windowHandle)
 
 }
 
+
+int main() {
+	return WinMain(GetModuleHandle(NULL), NULL, GetCommandLine(), SW_SHOW);
+}
+
+
 int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
 	WNDCLASS windowClass = {};
