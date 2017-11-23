@@ -82,7 +82,7 @@ std::shared_ptr<Node> Node::findBestNode(int currentMin, int currentMax)
 
 						if (newMemory.doMove(position, destination).isValid())
 						{
-							childNodes.push_back(std::shared_ptr<Node>(new Node(this, newMemory, { position, destination }, !isMax, depth + 1)));
+							childNodes.push_back(std::make_shared<Node>(this, newMemory, MoveInfo(position, destination), !isMax, depth + 1));
 						}
 					}
 				}
