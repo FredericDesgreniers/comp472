@@ -73,7 +73,10 @@ void Node::findBestNode(int currentMin, int currentMax)
 		}
 	};
 
-	std::priority_queue<std::shared_ptr<Node>, std::vector<std::shared_ptr<Node>>, decltype(cmp)> childNodes(cmp);
+	std::vector<std::shared_ptr<Node>> container;
+	container.reserve(tokenList.size()*2);
+
+	std::priority_queue<std::shared_ptr<Node>, std::vector<std::shared_ptr<Node>>, decltype(cmp)> childNodes(cmp, std::move(container));
 
 	int currentValue = isMax ? INT_MIN : INT_MAX;
 

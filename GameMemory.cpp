@@ -116,11 +116,15 @@ MoveResult GameMemory::doMoveUnsafe(const vec2 &origin, const vec2 &destination)
 
 	TileType originTile = getTileAt(origin);
 
-	auto killList = getKillsInDirection(origin + direction, direction);
+	std::vector<vec2> killList;
+	killList.reserve(5);
+	getKillsInDirection(origin + direction, direction, killList);
+
 
 	if (killList.size() == 0)
 	{
-		killList = getKillsInDirection(origin, -direction);
+		killList.clear();
+		getKillsInDirection(origin, -direction, killList);
 	}
 
 	if (killList.size() > 0)
@@ -169,26 +173,26 @@ bool GameMemory::isValidMove(vec2 origin, vec2 destination)
 
 	return true;
 }
-
-
-
-std::vector<vec2> GameMemory::getKillsInDirection(const vec2 origin, const vec2 direction)
+void GameMemory::getKillsInDirection(const vec2 origin, const vec2 direction, std::vector<vec2> &killList)
 {
 	const auto nextTileInDirection = origin + direction;
 	TileType tileType = getTileAt(nextTileInDirection);
 
-	if(tileType == currentTurn || tileType == EMPTY || tileType == INVALID)
+	if (tileType == currentTurn || tileType == EMPTY || tileType == INVALID)
 	{
-		return std::vector<vec2>();
+		return;
 	}
 
-	std::vector<vec2> killList;
 	killList.push_back(nextTileInDirection);
 
-	std::vector<vec2> nextKills = getKillsInDirection(nextTileInDirection, direction);
+	getKillsInDirection(nextTileInDirection, direction, killList);
+}
 
-	killList.insert(std::end(killList), std::begin(nextKills), std::end(nextKills));
 
+std::vector<vec2> GameMemory::getKillsInDirection(const vec2 origin, const vec2 direction)
+{
+	std::vector<vec2> killList;
+	getKillsInDirection(origin, direction, killList);
 	return killList;
 }
 

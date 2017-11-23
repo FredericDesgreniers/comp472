@@ -77,6 +77,7 @@ public:
 
 	bool isValidMove(vec2 origin, vec2 destination);
 
+	void getKillsInDirection(const vec2 origin, const vec2 direction, std::vector<vec2> &killList);
 	std::vector<vec2> getKillsInDirection(const vec2 origin, const vec2 direction);
 
 	void nextTurn();
