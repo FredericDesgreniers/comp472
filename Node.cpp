@@ -9,14 +9,14 @@
 Node::Node(Node *parent, GameMemory &memory, MoveInfo moveInfo, bool isMax, int depth, int currentMin, int currentMax): parent(parent), memory(memory)
 		, moveInfo(moveInfo), isMax(isMax), depth(depth), currentMin(currentMin), currentMax(currentMax)
 {
+	heuristic = 0;
 	if(depth == maxDepth)
 	{
 		calculateHeuristic();
 	}
-
-	if (depth < maxDepth)
+	else if (depth < maxDepth)
 	{
-		auto bestNode = findBestChild();
+		bestNode = findBestNode();
 		if (bestNode != nullptr) {
 			heuristic = bestNode->heuristic;
 			bestMove = bestNode->moveInfo;
@@ -24,6 +24,7 @@ Node::Node(Node *parent, GameMemory &memory, MoveInfo moveInfo, bool isMax, int 
 		else
 		{
 			calculateHeuristic();
+			bestMove = MoveInfo{ {0},{0}};
 		}
 	}
 
@@ -32,28 +33,19 @@ Node::Node(Node *parent, GameMemory &memory, MoveInfo moveInfo, bool isMax, int 
 
 void Node::calculateHeuristic()
 {
-	if(memory.getGreenPositions().size() == 0)
-	{
-		heuristic = INT_MIN+10;
-	}else if(memory.getRedPositions().size() == 0)
-	{
-		heuristic = INT_MAX-10;
-	}
-	else
-	{
-		heuristic = memory.getGreenPositions().size() - memory.getRedPositions().size();
-	}
+	heuristic = memory.getGreenPositions().size() - memory.getRedPositions().size();
+
 }
 
-Node* Node::findBestChild()
+std::shared_ptr<Node> Node::findBestNode()
 {
 	auto &tokenList = memory.getCurrentTurnTokenList();
 
 	//current min/max value
 	int currentValue = isMax ? INT_MIN : INT_MAX;
 
+	std::shared_ptr<Node> bestNode;
 	//current best node
-	Node* bestNode = nullptr;
 
 
 	for(const auto &token : tokenList)
@@ -63,7 +55,7 @@ Node* Node::findBestChild()
 		{
 			for(int dy = -1; dy <= 1; dy++)
 			{
-				if(dx != 0 && dy != 0)
+				if(dx != 0 || dy != 0)
 				{
 					auto position = token;
 					auto direction = vec2{ dx, dy };
@@ -75,14 +67,10 @@ Node* Node::findBestChild()
 
 						if (newMemory.doMove(position, destination).isValid())
 						{
-							children.push_back(Node(this, newMemory, { position, destination }, !isMax, depth + 1, currentMin, currentMax));
-							Node *node = &children.at(children.size() - 1);
+							auto node = std::make_shared<Node>(Node(this, newMemory, { position, destination }, !isMax, depth + 1, currentMin, currentMax));
 							
 							//make sure best node is something
-							if(bestNode == nullptr)
-							{
-								bestNode = node;
-							}
+
 							
 							//Min max alghrithm
 							//see https://en.wikipedia.org/wiki/Alpha%E2%80%93beta_pruning#Pseudocode
@@ -115,7 +103,6 @@ Node* Node::findBestChild()
 			}
 		}
 	}
-
 	return bestNode;
 }
 

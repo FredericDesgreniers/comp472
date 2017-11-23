@@ -25,6 +25,11 @@ struct vec2{
 		x = a;
 		y = b;
 	}
+	vec2(const vec2& v)
+	{
+		x = v.x;
+		y = v.y;
+	}
 
 	std::basic_string<char> getBoardCoordinates()
 	{

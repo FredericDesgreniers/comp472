@@ -4,6 +4,8 @@
 #include <iostream>
 #include "GameMemory.h"
 #include "Node.h"
+#include <windows.h>
+#include <profileapi.h>
 
 GameMemory::GameMemory(): playerType()
 {
@@ -223,11 +225,30 @@ void GameMemory::start()
 
 void GameMemory::doAiMove()
 {
+	LARGE_INTEGER frequency;        // ticks per second
+	LARGE_INTEGER t1, t2;           // ticks
+	double elapsedTime;
+	// get ticks per second
+	QueryPerformanceFrequency(&frequency);
+
+	// start timer
+	QueryPerformanceCounter(&t1);
+
+		
+
 	Node node(*this);
 	auto bestMove = node.getBestMove();
 	doMove(bestMove.source, bestMove.destination);
 	std::cout << "Moving from " << bestMove.source.getBoardCoordinates() << ", " << bestMove.destination.getBoardCoordinates() << std::endl;
 	std::cout << "h: " << node.getHeuristic() << std::endl;
+
+	// stop timer
+	QueryPerformanceCounter(&t2);
+
+	// compute and print the elapsed time in millisec
+	elapsedTime = (t2.QuadPart - t1.QuadPart) * 1000.0 / frequency.QuadPart;
+	std::cout << "Time for move: " << elapsedTime/1000 << "s" << std::endl;
+
 	nextTurn();
 }
 

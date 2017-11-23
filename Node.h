@@ -3,7 +3,7 @@
 
 #include "GameMemory.h"
 #include <memory>
-#define maxDepth 5
+#define maxDepth 6
 
 struct MoveInfo
 {
@@ -28,13 +28,13 @@ class Node
 
 	MoveInfo moveInfo;
 	MoveInfo bestMove = {0, 0};
+	
+	std::shared_ptr<Node> bestNode;
 
 	void calculateHeuristic();
-	Node* findBestChild();
+	std::shared_ptr<Node>  findBestNode();
 
 	int depth;
-
-	std::vector<Node> children;
 
 	int currentMin, currentMax;
 
