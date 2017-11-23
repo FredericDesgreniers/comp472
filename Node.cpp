@@ -60,8 +60,7 @@ std::shared_ptr<Node> Node::findBestNode(int currentMin, int currentMax)
 	auto cmp = [shouldBeMax](std::shared_ptr<Node> &left, std::shared_ptr<Node> &right) {if(shouldBeMax){return left->simpleHeuristic < right->simpleHeuristic; } else {return right->simpleHeuristic < left->simpleHeuristic; }
 };
 	std::priority_queue<std::shared_ptr<Node>, std::vector<std::shared_ptr<Node>>, decltype(cmp)> childNodes(cmp);
-	//std::vector<std::shared_ptr<Node>> childNodes;
-	//current min/max value
+
 	int currentValue = isMax ? INT_MIN : INT_MAX;
 
 	for(const auto &token : tokenList)
@@ -85,20 +84,7 @@ std::shared_ptr<Node> Node::findBestNode(int currentMin, int currentMax)
 			}
 		}
 	}
-	
-	/*std::sort(childNodes.begin(), childNodes.end(), [this](std::shared_ptr<Node> &left, std::shared_ptr<Node> &right)
-	{
-		if (!isMax) {
-			return left->simpleHeuristic < right->simpleHeuristic;
-		}
-		else
-		{
-			return right->simpleHeuristic < left->simpleHeuristic;
-		}
 
-	});*/
-
-	//for(auto node : childNodes)
 	while(!childNodes.empty()){
 		auto node = childNodes.top();
 		childNodes.pop();
