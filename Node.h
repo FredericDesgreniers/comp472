@@ -30,7 +30,7 @@ class Node
 	MoveInfo bestMove = {0, 0};
 
 	void calculateHeuristic();
-	void findNextMoves();
+	Node* findNextMoves();
 
 	int depth;
 
@@ -48,7 +48,6 @@ public:
 		return heuristic;
 	}
 
-	Node* getBestNode();
 
 	MoveInfo getBestMove()
 	{

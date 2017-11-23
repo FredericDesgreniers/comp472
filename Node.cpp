@@ -16,8 +16,7 @@ Node::Node(Node *parent, GameMemory &memory, MoveInfo moveInfo, bool isMax, int 
 
 	if (depth < maxDepth)
 	{
-		findNextMoves();
-		auto bestNode = getBestNode();
+		auto bestNode = findNextMoves();
 		heuristic = bestNode->heuristic;
 		bestMove = bestNode->moveInfo;
 	}
@@ -27,36 +26,25 @@ Node::Node(Node *parent, GameMemory &memory, MoveInfo moveInfo, bool isMax, int 
 
 void Node::calculateHeuristic()
 {
-	int greenHorizontalScore = 0;
-	int greenVerticalScore = 0;
-
-	auto &greenTokens = memory.getGreenPositions();
-
-	for(const auto &greenToken : memory.getGreenPositions())
+	if(memory.getGreenPositions().size() == 0)
 	{
-		greenHorizontalScore += greenToken.x * greenTokens.size();
-		greenVerticalScore += greenToken.y * greenTokens.size();
-	}
-
-	int redHorizontalScore = 0;
-	int redVerticalScore = 0;
-
-	auto &redTokens = memory.getRedPositions();
-
-	for(const auto &redToken : redTokens)
+		heuristic = INT_MIN;
+	}else if(memory.getRedPositions().size() == 0)
 	{
-		redHorizontalScore += redToken.x * redTokens.size();
-		redVerticalScore += redToken.y * redTokens.size();
+		heuristic = INT_MAX;
 	}
-
-	heuristic = greenTokens.size() - redTokens.size();
+	else
+	{
+		heuristic = memory.getGreenPositions().size() - memory.getRedPositions().size();
+	}
 }
 
-void Node::findNextMoves()
+Node* Node::findNextMoves()
 {
 	auto &tokenList = memory.getCurrentTurnTokenList();
 
 	int currentValue = isMax ? INT_MIN : INT_MAX;
+	Node* bestNode = nullptr;
 
 	for(const auto &token : tokenList)
 	{
@@ -76,69 +64,40 @@ void Node::findNextMoves()
 
 						if (newMemory.doMove(position, destination).isValid())
 						{
-							Node *node = new Node(this, newMemory, { position, destination }, !isMax, depth + 1, currentMin, currentMax);
+							children.push_back(std::make_unique<Node>(Node(this, newMemory, { position, destination }, !isMax, depth + 1, currentMin, currentMax)));
+							auto &node = children.at(children.size() - 1);
+							
 							if(isMax)
 							{
-								currentValue = std::max(node->getHeuristic(), currentValue);
+								if(node->getHeuristic() > currentValue)
+								{
+									currentValue = node->getHeuristic();
+									bestNode = &(*node);
+								}
 								currentMin = std::max(currentMin, currentValue);
 							}
 							else
 							{
-								currentValue = std::min(node->getHeuristic(), currentValue);
+								if (node->getHeuristic() < currentValue)
+								{
+									currentValue = node->getHeuristic();
+									bestNode = &(*node);
+								}
 								currentMax = std::min(currentMax, currentValue);
 							}
-	
-							children.push_back(std::unique_ptr<Node>(node));
 
 							if (currentMax <= currentMin)
 							{
-								return;
+								return bestNode;
 							}
 						}
 					}
-					
-					
-					//tryMove(token, {dx, dy});
-				}
-			}
-		}
-	}
-}
-
-
-Node *Node::getBestNode()
-{
-
-	Node *bestChild = nullptr;
-
-	for(auto &child : children)
-	{
-		auto& childPtr = *child;
-
-		if(bestChild == nullptr)
-		{
-			bestChild = &childPtr;
-		}
-		else
-		{
-			if(isMax)
-			{
-				if (bestChild->getHeuristic() < childPtr.getHeuristic())
-				{
-					bestChild = &childPtr;
-				}
-			}
-			else
-			{
-				if (bestChild->getHeuristic() > (*child).getHeuristic())
-				{
-					bestChild = &childPtr;
 				}
 			}
 		}
 	}
 
-	return bestChild;
+	return bestNode;
 }
 
 Node::Node(GameMemory memory):Node(nullptr, memory, {0,0}, memory.getCurrentTurn() == GREEN,0, INT_MIN, INT_MAX)
