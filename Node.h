@@ -24,13 +24,13 @@ class Node
 
 	Node *parent;
 
-	GameMemory memory;
+	GameMemory& memory;
 
 	MoveInfo moveInfo;
 	MoveInfo bestMove = {0, 0};
 
 	void calculateHeuristic();
-	Node* findNextMoves();
+	Node* findBestChild();
 
 	int depth;
 
@@ -41,7 +41,7 @@ class Node
 public:
 	Node(Node *parent, GameMemory &memory, MoveInfo moveInfo, bool isMax, int depth, int currentMin, int currentMax);
 
-	Node(GameMemory memory);
+	Node(GameMemory &memory);
 
 	int getHeuristic()
 	{
