@@ -4,9 +4,10 @@
 
 #include <iostream>
 #include "Node.h"
+#include <algorithm>
 
-Node::Node(Node *parent, GameMemory &memory, MoveInfo moveInfo, bool isMax, int depth): parent(parent), memory(memory)
-		, moveInfo(moveInfo), isMax(isMax), depth(depth)
+Node::Node(Node *parent, GameMemory &memory, MoveInfo moveInfo, bool isMax, int depth, int currentMin, int currentMax): parent(parent), memory(memory)
+		, moveInfo(moveInfo), isMax(isMax), depth(depth), currentMin(currentMin), currentMax(currentMax)
 {
 	if(depth == maxDepth)
 	{
@@ -48,12 +49,14 @@ void Node::calculateHeuristic()
 		redVerticalScore += redToken.y * redTokens.size();
 	}
 
-	heuristic = 100 * greenHorizontalScore + 50 * greenVerticalScore - 100 * redHorizontalScore - 50 * redVerticalScore;
+	heuristic = greenTokens.size() - redTokens.size();
 }
 
 void Node::findNextMoves()
 {
 	auto &tokenList = memory.getCurrentTurnTokenList();
+
+	int currentValue = isMax ? INT_MIN : INT_MAX;
 
 	for(const auto &token : tokenList)
 	{
@@ -63,7 +66,39 @@ void Node::findNextMoves()
 			{
 				if(!(dx == 0 && dy == 0))
 				{
-					tryMove(token, {dx, dy});
+					auto position = token;
+					auto direction = vec2{ dx, dy };
+
+					auto destination = position + direction;
+					if (memory.isValidMove(position, destination))
+					{
+						GameMemory newMemory = memory;
+
+						if (newMemory.doMove(position, destination).isValid())
+						{
+							Node *node = new Node(this, newMemory, { position, destination }, !isMax, depth + 1, currentMin, currentMax);
+							if(isMax)
+							{
+								currentValue = std::max(node->getHeuristic(), currentValue);
+								currentMin = std::max(currentMin, currentValue);
+							}
+							else
+							{
+								currentValue = std::min(node->getHeuristic(), currentValue);
+								currentMax = std::min(currentMax, currentValue);
+							}
+	
+							children.push_back(std::make_unique<Node *>(node));
+
+							if (currentMax <= currentMin)
+							{
+								return;
+							}
+						}
+					}
+					
+					
+					//tryMove(token, {dx, dy});
 				}
 			}
 		}
@@ -79,7 +114,7 @@ void Node::tryMove(vec2 position, vec2 direction)
 
 		if (newMemory.doMove(position, destination).isValid())
 		{
-			children.push_back(Node(this, newMemory, {position, destination}, !isMax, depth + 1));
+			//children.push_back(Node(this, newMemory, {position, destination}, !isMax, depth + 1, currentMin, currentMax));
 		}
 	}
 
@@ -91,24 +126,26 @@ Node *Node::getBestNode()
 	Node *bestChild = nullptr;
 	for(auto &child : children)
 	{
+		auto childPtr = *child;
+
 		if(bestChild == nullptr)
 		{
-			bestChild = &child;
+			bestChild = childPtr;
 		}
 		else
 		{
 			if(isMax)
 			{
-				if (bestChild->getHeuristic() < child.getHeuristic())
+				if (bestChild->getHeuristic() < childPtr->getHeuristic())
 				{
-					bestChild = &child;
+					bestChild = childPtr;
 				}
 			}
 			else
 			{
-				if (bestChild->getHeuristic() > child.getHeuristic())
+				if (bestChild->getHeuristic() > childPtr->getHeuristic())
 				{
-					bestChild = &child;
+					bestChild = childPtr;
 				}
 			}
 		}
@@ -117,7 +154,7 @@ Node *Node::getBestNode()
 	return bestChild;
 }
 
-Node::Node(GameMemory memory):Node(nullptr, memory, {0,0}, memory.getCurrentTurn() == GREEN,0)
+Node::Node(GameMemory memory):Node(nullptr, memory, {0,0}, memory.getCurrentTurn() == GREEN,0, INT_MIN, INT_MAX)
 {
 	std::cout << "Finding for " << (isMax?"MAX":"MIN") << std::endl;
 }

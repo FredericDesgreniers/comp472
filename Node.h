@@ -2,6 +2,7 @@
 
 
 #include "GameMemory.h"
+#include <memory>
 #define maxDepth 3
 
 struct MoveInfo
@@ -34,10 +35,12 @@ class Node
 
 	int depth;
 
-	std::vector<Node> children;
+	std::vector<std::unique_ptr<Node *>> children;
+
+	int currentMin, currentMax;
 
 public:
-	Node(Node *parent, GameMemory &memory, MoveInfo moveInfo, bool isMax, int depth);
+	Node(Node *parent, GameMemory &memory, MoveInfo moveInfo, bool isMax, int depth, int currentMin, int currentMax);
 
 	Node(GameMemory memory);
 
