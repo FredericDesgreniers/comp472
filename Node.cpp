@@ -11,35 +11,40 @@ int Node::totalNodes = 0;
 int Node::totalEvaluates = 0;
 int Node::totalPrunning = 0;
 
-Node::Node(Node *parent, GameMemory memory, MoveInfo moveInfo, bool isMax, int depth): parent(parent), memory(memory)
+Node::Node(GameMemory memory, MoveInfo moveInfo, bool isMax, int depth): memory(memory)
 		, moveInfo(moveInfo), isMax(isMax), depth(depth)
 {
-	memory.doMove(moveInfo.source, moveInfo.destination);
+	if(moveInfo.source.x >= 0)
+	{
+		memory.doMoveUnsafe(moveInfo.source, moveInfo.destination);
+	}
+#ifdef TRACK
 	totalNodes++;
+#endif
 	simpleHeuristic = memory.getGreenPositions().size() - memory.getRedPositions().size();
 }
 
 void Node::evaluate(int currentMin, int currentMax)
 {
+#ifdef TRACK
 	totalEvaluates++;
+#endif
 
-	heuristic = 0;
 	if (depth == maxDepth)
 	{
 		calculateHeuristic();
 	}
+	else if(memory.getGreenPositions().size() == 0)
+	{
+		heuristic = INT_MIN/depth;
+	}
+	else if(memory.getRedPositions().size() == 0)
+	{
+		heuristic = INT_MAX/depth;
+	}
 	else if (depth < maxDepth)
 	{
-		bestNode = findBestNode(currentMin, currentMax);
-		if (bestNode) {
-			heuristic = bestNode->heuristic;
-			bestMove = bestNode->moveInfo;
-		}
-		else
-		{
-			calculateHeuristic();
-			bestMove = MoveInfo{ { 0 },{ 0 } };
-		}
+		findBestNode(currentMin, currentMax);
 	}
 }
 
@@ -50,11 +55,12 @@ void Node::calculateHeuristic()
 
 }
 
-std::shared_ptr<Node> Node::findBestNode(int currentMin, int currentMax)
+void Node::findBestNode(int currentMin, int currentMax)
 {
 	auto &tokenList = memory.getCurrentTurnTokenList();
 
-	std::shared_ptr<Node> bestNode;
+	
+
 	//current best node
 	bool shouldBeMax = isMax;
 	auto cmp = [shouldBeMax](std::shared_ptr<Node> &left, std::shared_ptr<Node> &right) {if(shouldBeMax){return left->simpleHeuristic < right->simpleHeuristic; } else {return right->simpleHeuristic < left->simpleHeuristic; }
@@ -78,16 +84,18 @@ std::shared_ptr<Node> Node::findBestNode(int currentMin, int currentMax)
 
 					if (memory.isValidMove(position, destination))
 					{
-						childNodes.push(std::make_shared<Node>(this, memory, MoveInfo(position, destination), !isMax, depth + 1));
+						childNodes.push(std::make_shared<Node>(memory, MoveInfo(position, destination), !isMax, depth + 1));
 					}
 				}
 			}
 		}
 	}
 
+	std::shared_ptr<Node> bestNode;
+
 	while(!childNodes.empty()){
-		auto node = childNodes.top();
-		childNodes.pop();
+		const std::shared_ptr<Node> &node = childNodes.top();
+		
 		node->evaluate(currentMin, currentMax);
 		
 
@@ -114,15 +122,21 @@ std::shared_ptr<Node> Node::findBestNode(int currentMin, int currentMax)
 
 		if (currentMax <= currentMin)
 		{
+#ifdef TRACK
 			totalPrunning++;
-			return bestNode;
+#endif
+ 			heuristic = bestNode->getHeuristic();
+			bestMove = MoveInfo(bestNode->getMove());
+			return;
 		}
+		childNodes.pop();
 	}
-
-	return bestNode;
+	heuristic = bestNode->getHeuristic();
+	bestMove = MoveInfo( bestNode->getMove() );
+	return;
 }
 
-Node::Node(GameMemory memory):Node(nullptr, memory, {0,0}, memory.getCurrentTurn() == GREEN,0)
+Node::Node(GameMemory memory):Node(memory, {-1,-1}, memory.getCurrentTurn() == GREEN,0)
 {
 	std::cout << "Finding for " << (isMax?"MAX":"MIN") << std::endl;
 }

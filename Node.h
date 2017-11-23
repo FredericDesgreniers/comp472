@@ -5,6 +5,8 @@
 #include <memory>
 #define maxDepth 7
 
+//#define TRACK
+
 struct MoveInfo
 {
 	vec2 source;
@@ -20,23 +22,19 @@ struct MoveInfo
 
 class Node
 {
-
-
 	int heuristic;
 
 	bool isMax;
-
-	Node *parent;
 
 	GameMemory memory;
 
 	MoveInfo moveInfo;
 	MoveInfo bestMove = {0, 0};
 	
-	std::shared_ptr<Node> bestNode;
+
 
 	void calculateHeuristic();
-	std::shared_ptr<Node>  findBestNode(int currentMin, int currentMax);
+	void  findBestNode(int currentMin, int currentMax);
 
 	int depth;
 
@@ -47,7 +45,7 @@ public:
 	static int totalPrunning;
 	static int totalNodes;
 
-	Node(Node *parent, GameMemory memory, MoveInfo moveInfo, bool isMax, int depth);
+	Node(GameMemory memory, MoveInfo moveInfo, bool isMax, int depth);
 
 	Node(GameMemory memory);
 

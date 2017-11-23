@@ -106,17 +106,23 @@ MoveResult GameMemory::doMove(vec2 origin, vec2 destination)
 		return { false,{} };
 	}
 
+	return doMoveUnsafe(origin, destination);
+}
+
+MoveResult GameMemory::doMoveUnsafe(const vec2 &origin, const vec2 &destination)
+{
+
 	vec2 direction = destination - origin;
 
 	TileType originTile = getTileAt(origin);
 
-	auto killList = getKillsInDirection(origin+direction, direction);
+	auto killList = getKillsInDirection(origin + direction, direction);
 
-	if(killList.size() == 0)
+	if (killList.size() == 0)
 	{
 		killList = getKillsInDirection(origin, -direction);
 	}
-	
+
 	if (killList.size() > 0)
 	{
 		turnsWithoutAttack = 0;
@@ -126,7 +132,7 @@ MoveResult GameMemory::doMove(vec2 origin, vec2 destination)
 		turnsWithoutAttack++;
 	}
 
-	for(auto &killPosition : killList)
+	for (auto &killPosition : killList)
 	{
 		setTileAt(killPosition, EMPTY);
 	}
@@ -134,7 +140,7 @@ MoveResult GameMemory::doMove(vec2 origin, vec2 destination)
 	setTileAt(destination, originTile);
 	setTileAt(origin, EMPTY);
 
-	return {true, killList};
+	return { true, killList };
 }
 
 bool GameMemory::isValidMove(vec2 origin, vec2 destination)

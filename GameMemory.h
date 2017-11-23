@@ -73,6 +73,7 @@ public:
 	void generateTile(vec2 vec2);
 
 	MoveResult doMove(vec2 origin, vec2 destination);
+	MoveResult doMoveUnsafe(const vec2 &origin, const vec2 &destination);
 
 	bool isValidMove(vec2 origin, vec2 destination);
 
