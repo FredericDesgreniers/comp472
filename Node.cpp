@@ -78,7 +78,7 @@ std::shared_ptr<Node> Node::findBestNode(int currentMin, int currentMax)
 
 					if (memory.isValidMove(position, destination))
 					{
-						childNodes.push(std::make_shared<Node>(this, memory, MoveInfo(position, position + direction), !isMax, depth + 1));
+						childNodes.push(std::make_shared<Node>(this, memory, MoveInfo(position, destination), !isMax, depth + 1));
 					}
 				}
 			}
