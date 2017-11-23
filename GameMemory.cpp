@@ -234,9 +234,19 @@ void GameMemory::doAiMove()
 	// start timer
 	QueryPerformanceCounter(&t1);
 
-		
+
+	Node::totalEvaluates = 0;
+	Node::totalPrunning = 0;
+	Node::totalNodes = 0;
 
 	Node node(*this);
+	node.evaluate(INT_MIN, INT_MAX);
+
+	std::cout << "Nodes: " << Node::totalNodes << std::endl;
+	std::cout << "Evaluates: " << Node::totalEvaluates << std::endl;
+	std::cout << "Prunnings: " << Node::totalPrunning << std::endl;
+	
+
 	auto bestMove = node.getBestMove();
 	doMove(bestMove.source, bestMove.destination);
 	std::cout << "Moving from " << bestMove.source.getBoardCoordinates() << ", " << bestMove.destination.getBoardCoordinates() << std::endl;

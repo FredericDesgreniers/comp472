@@ -16,15 +16,19 @@ struct MoveInfo
 	}
 };
 
+
+
 class Node
 {
+
+
 	int heuristic;
 
 	bool isMax;
 
 	Node *parent;
 
-	GameMemory& memory;
+	GameMemory memory;
 
 	MoveInfo moveInfo;
 	MoveInfo bestMove = {0, 0};
@@ -32,22 +36,27 @@ class Node
 	std::shared_ptr<Node> bestNode;
 
 	void calculateHeuristic();
-	std::shared_ptr<Node>  findBestNode();
+	std::shared_ptr<Node>  findBestNode(int currentMin, int currentMax);
 
 	int depth;
 
-	int currentMin, currentMax;
+	int simpleHeuristic;
 
 public:
-	Node(Node *parent, GameMemory &memory, MoveInfo moveInfo, bool isMax, int depth, int currentMin, int currentMax);
+	static int totalEvaluates;
+	static int totalPrunning;
+	static int totalNodes;
 
-	Node(GameMemory &memory);
+	Node(Node *parent, GameMemory memory, MoveInfo moveInfo, bool isMax, int depth);
+
+	Node(GameMemory memory);
 
 	int getHeuristic()
 	{
 		return heuristic;
 	}
 
+	void evaluate(int currentMin, int currentMax);
 
 	MoveInfo getBestMove()
 	{
