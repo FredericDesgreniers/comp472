@@ -88,7 +88,7 @@ void Node::findNextMoves()
 								currentMax = std::min(currentMax, currentValue);
 							}
 	
-							children.push_back(std::make_unique<Node *>(node));
+							children.push_back(std::unique_ptr<Node>(node));
 
 							if (currentMax <= currentMin)
 							{
@@ -105,47 +105,34 @@ void Node::findNextMoves()
 	}
 }
 
-void Node::tryMove(vec2 position, vec2 direction)
-{
-	auto destination = position + direction;
-	if(memory.isValidMove(position, destination))
-	{
-		GameMemory newMemory = memory;
-
-		if (newMemory.doMove(position, destination).isValid())
-		{
-			//children.push_back(Node(this, newMemory, {position, destination}, !isMax, depth + 1, currentMin, currentMax));
-		}
-	}
-
-}
 
 Node *Node::getBestNode()
 {
 
 	Node *bestChild = nullptr;
+
 	for(auto &child : children)
 	{
-		auto childPtr = *child;
+		auto& childPtr = *child;
 
 		if(bestChild == nullptr)
 		{
-			bestChild = childPtr;
+			bestChild = &childPtr;
 		}
 		else
 		{
 			if(isMax)
 			{
-				if (bestChild->getHeuristic() < childPtr->getHeuristic())
+				if (bestChild->getHeuristic() < childPtr.getHeuristic())
 				{
-					bestChild = childPtr;
+					bestChild = &childPtr;
 				}
 			}
 			else
 			{
-				if (bestChild->getHeuristic() > childPtr->getHeuristic())
+				if (bestChild->getHeuristic() > (*child).getHeuristic())
 				{
-					bestChild = childPtr;
+					bestChild = &childPtr;
 				}
 			}
 		}

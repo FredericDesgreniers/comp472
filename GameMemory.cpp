@@ -244,6 +244,11 @@ std::vector<vec2> &GameMemory::getCurrentTurnTokenList()
 		{
 			return greenPositions;
 		}
+
+		default:
+			{
+			return greenPositions;
+			}
 	}
 }
 
