@@ -17,7 +17,7 @@ Node::Node(Node *parent, GameMemory &memory, MoveInfo moveInfo, bool isMax, int 
 	else if (depth < maxDepth)
 	{
 		bestNode = findBestNode();
-		if (bestNode != nullptr) {
+		if (bestNode) {
 			heuristic = bestNode->heuristic;
 			bestMove = bestNode->moveInfo;
 		}
