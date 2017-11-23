@@ -14,6 +14,7 @@ int Node::totalPrunning = 0;
 Node::Node(Node *parent, GameMemory memory, MoveInfo moveInfo, bool isMax, int depth): parent(parent), memory(memory)
 		, moveInfo(moveInfo), isMax(isMax), depth(depth)
 {
+	memory.doMove(moveInfo.source, moveInfo.destination);
 	totalNodes++;
 	simpleHeuristic = memory.getGreenPositions().size() - memory.getRedPositions().size();
 }
@@ -74,16 +75,11 @@ std::shared_ptr<Node> Node::findBestNode(int currentMin, int currentMax)
 				{
 					auto position = token;
 					auto direction = vec2{ dx, dy };
-
 					auto destination = position + direction;
+
 					if (memory.isValidMove(position, destination))
 					{
-						GameMemory newMemory = memory;
-
-						if (newMemory.doMove(position, destination).isValid())
-						{
-							childNodes.push(std::make_shared<Node>(this, newMemory, MoveInfo(position, destination), !isMax, depth + 1));
-						}
+						childNodes.push(std::make_shared<Node>(this, memory, MoveInfo(position, position + direction), !isMax, depth + 1));
 					}
 				}
 			}

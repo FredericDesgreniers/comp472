@@ -101,14 +101,14 @@ void GameMemory::generateTile(vec2 position)
 
 MoveResult GameMemory::doMove(vec2 origin, vec2 destination)
 {
+	if (!isValidMove(origin, destination))
+	{
+		return { false,{} };
+	}
+
 	vec2 direction = destination - origin;
 
 	TileType originTile = getTileAt(origin);
-
-	if(!isValidMove(origin, destination))
-	{
-		return {false, {}};
-	}
 
 	auto killList = getKillsInDirection(origin+direction, direction);
 
