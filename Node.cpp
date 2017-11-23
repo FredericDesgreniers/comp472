@@ -17,8 +17,14 @@ Node::Node(Node *parent, GameMemory &memory, MoveInfo moveInfo, bool isMax, int 
 	if (depth < maxDepth)
 	{
 		auto bestNode = findNextMoves();
-		heuristic = bestNode->heuristic;
-		bestMove = bestNode->moveInfo;
+		if (bestNode != nullptr) {
+			heuristic = bestNode->heuristic;
+			bestMove = bestNode->moveInfo;
+		}
+		else
+		{
+			calculateHeuristic();
+		}
 	}
 
 
@@ -72,7 +78,7 @@ Node* Node::findNextMoves()
 								if(node->getHeuristic() > currentValue)
 								{
 									currentValue = node->getHeuristic();
-									bestNode = &(*node);
+									bestNode = node.get();
 								}
 								currentMin = std::max(currentMin, currentValue);
 							}
@@ -81,7 +87,7 @@ Node* Node::findNextMoves()
 								if (node->getHeuristic() < currentValue)
 								{
 									currentValue = node->getHeuristic();
-									bestNode = &(*node);
+									bestNode = node.get();
 								}
 								currentMax = std::min(currentMax, currentValue);
 							}
