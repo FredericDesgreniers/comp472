@@ -41,11 +41,11 @@ void GameMemory::setTileAt(vec2 position, TileType type)
 		{
 			case GREEN:
 			{
-				greenPositions.erase(remove_if(greenPositions.begin(), greenPositions.end(), [position](auto value){return value == position;}));
+				greenPositions.erase(std::remove(greenPositions.begin(), greenPositions.end(),  position));
 			}break;
 			case RED:
 			{
-				redPositions.erase(std::remove_if(redPositions.begin(), redPositions.end(), [position](auto value){return value == position;}));
+				redPositions.erase(std::remove(redPositions.begin(), redPositions.end(), position));
 			}break;
 		}
 
