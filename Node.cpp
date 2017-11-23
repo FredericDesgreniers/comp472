@@ -75,13 +75,13 @@ Node* Node::findBestChild()
 
 						if (newMemory.doMove(position, destination).isValid())
 						{
-							children.push_back(std::make_unique<Node>(Node(this, newMemory, { position, destination }, !isMax, depth + 1, currentMin, currentMax)));
-							auto &node = children.at(children.size() - 1);
+							children.push_back(Node(this, newMemory, { position, destination }, !isMax, depth + 1, currentMin, currentMax));
+							Node *node = &children.at(children.size() - 1);
 							
 							//make sure best node is something
 							if(bestNode == nullptr)
 							{
-								bestNode = node.get();
+								bestNode = node;
 							}
 							
 							//Min max alghrithm
@@ -91,7 +91,7 @@ Node* Node::findBestChild()
 								if(node->getHeuristic() > currentValue)
 								{
 									currentValue = node->getHeuristic();
-									bestNode = node.get();
+									bestNode = node;
 								}
 								currentMin = std::max(currentMin, currentValue);
 							}
@@ -100,7 +100,7 @@ Node* Node::findBestChild()
 								if (node->getHeuristic() < currentValue)
 								{
 									currentValue = node->getHeuristic();
-									bestNode = node.get();
+									bestNode = node;
 								}
 								currentMax = std::min(currentMax, currentValue);
 							}

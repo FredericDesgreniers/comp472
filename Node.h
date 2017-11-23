@@ -34,7 +34,7 @@ class Node
 
 	int depth;
 
-	std::vector<std::unique_ptr<Node>> children;
+	std::vector<Node> children;
 
 	int currentMin, currentMax;
 
