@@ -104,11 +104,11 @@ void Node::findBestNode(int currentMin, int currentMax)
 	}
 
 	std::shared_ptr<Node> bestNode;
+	if (depth > 2)
+	{
+		while(!childNodes.empty()){
 
-	while(!childNodes.empty()){
-
-		if (depth > 2)
-		{
+		
 			std::shared_ptr<Node> node = childNodes.top();
 
 			node->evaluate(currentMin, currentMax);
@@ -120,24 +120,27 @@ void Node::findBestNode(int currentMin, int currentMax)
 
 			childNodes.pop();
 		}
-		else
-		{
+		
+	}
+	else
+	{
+		while (!childNodes.empty()) {
 			int threadNum = 2;
 			std::vector<std::shared_ptr<Node>> nodes;
-			nodes.reserve(4);
+			nodes.reserve(threadNum);
 			std::vector<std::future<void>> nodeFutures;
-			nodeFutures.reserve(4);
+			nodeFutures.reserve(threadNum);
 
-			for(int i = 0; i < threadNum; i++)
+			for (int i = 0; i < threadNum; i++)
 			{
-				if(!childNodes.empty())
+				if (!childNodes.empty())
 				{
 					std::shared_ptr<Node> node = childNodes.top();
 					childNodes.pop();
 					nodes.push_back(node);
 					nodeFutures.push_back(std::async(std::launch::async, &Node::evaluate, node.get(), currentMin, currentMax));
 				}
-				
+
 			}
 
 			int currentNode = 0;
