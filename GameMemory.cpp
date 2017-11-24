@@ -24,7 +24,7 @@ GameMemory::GameMemory(): playerType()
 
 
 
-TileType GameMemory::getTileAt(vec2 position)
+TileType GameMemory::getTileAt(const vec2 &position)
 {
 	if(!isPositionOnBoard(position))
 	{

@@ -27,7 +27,7 @@ struct vec2{
 	}
 	vec2(const vec2& v)
 	{
-		x = v.x;
+		x = v.x;               
 		y = v.y;
 	}
 

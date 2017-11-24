@@ -6,17 +6,18 @@
 #include "Node.h"
 #include <algorithm>
 #include <queue>
+#include <future>
 
 int Node::totalNodes = 0;
 int Node::totalEvaluates = 0;
 int Node::totalPrunning = 0;
 
-Node::Node(GameMemory memory, MoveInfo moveInfo, bool isMax, int depth): memory(memory)
+Node::Node(GameMemory& memory, MoveInfo moveInfo, bool isMax, int depth): memory(memory)
 		, moveInfo(moveInfo), isMax(isMax), depth(depth)
 {
 	if(moveInfo.source.x >= 0)
 	{
-		memory.doMoveUnsafe(moveInfo.source, moveInfo.destination);
+		this->memory.doMoveUnsafe(moveInfo.source, moveInfo.destination);
 	}
 #ifdef TRACK
 	totalNodes++;
@@ -105,43 +106,92 @@ void Node::findBestNode(int currentMin, int currentMax)
 	std::shared_ptr<Node> bestNode;
 
 	while(!childNodes.empty()){
-		const std::shared_ptr<Node> &node = childNodes.top();
-		
-		node->evaluate(currentMin, currentMax);
-		
 
-		//Min max alghrithm
-		//see https://en.wikipedia.org/wiki/Alpha%E2%80%93beta_pruning#Pseudocode
-		if (isMax)
+		if (depth > 2)
 		{
-			if (node->getHeuristic() > currentValue)
+			std::shared_ptr<Node> node = childNodes.top();
+
+			node->evaluate(currentMin, currentMax);
+
+			if (evaluateForBestNode(node, bestNode, currentValue, currentMin, currentMax))
 			{
-				currentValue = node->getHeuristic();
-				bestNode = node;
+				break;
 			}
-			currentMin = std::max(currentMin, currentValue);
+
+			childNodes.pop();
 		}
 		else
 		{
-			if (node->getHeuristic() < currentValue)
-			{
-				currentValue = node->getHeuristic();
-				bestNode = node;
-			}
-			currentMax = std::min(currentMax, currentValue);
-		}
+			int threadNum = 2;
+			std::vector<std::shared_ptr<Node>> nodes;
+			nodes.reserve(4);
+			std::vector<std::future<void>> nodeFutures;
+			nodeFutures.reserve(4);
 
-		if (currentMax <= currentMin)
-		{
-#ifdef TRACK
-			totalPrunning++;
-#endif
-			break;
+			for(int i = 0; i < threadNum; i++)
+			{
+				if(!childNodes.empty())
+				{
+					std::shared_ptr<Node> node = childNodes.top();
+					childNodes.pop();
+					nodes.push_back(node);
+					nodeFutures.push_back(std::async(std::launch::async, &Node::evaluate, node.get(), currentMin, currentMax));
+				}
+				
+			}
+
+			int currentNode = 0;
+			for (auto &f : nodeFutures)
+			{
+				f.wait();
+				if (evaluateForBestNode(nodes.at(currentNode++), bestNode, currentValue, currentMin, currentMax))
+				{
+					heuristic = bestNode->getHeuristic();
+					bestMove = MoveInfo(bestNode->getMove());
+
+					return;
+				}
+
+			}
+
 		}
-		childNodes.pop();
 	}
 	heuristic = bestNode->getHeuristic();
 	bestMove = MoveInfo( bestNode->getMove() );
+}
+
+bool Node::evaluateForBestNode(const std::shared_ptr<Node>& node, std::shared_ptr<Node>& bestNode, int& currentValue, int &currentMin, int &currentMax)
+{
+	//Min max alghrithm
+	//see https://en.wikipedia.org/wiki/Alpha%E2%80%93beta_pruning#Pseudocode
+	if (isMax)
+	{
+		if (node->getHeuristic() > currentValue)
+		{
+			currentValue = node->getHeuristic();
+			bestNode = node;
+		}
+		currentMin = std::max(currentMin, currentValue);
+	}
+	else
+	{
+		if (node->getHeuristic() < currentValue)
+		{
+			currentValue = node->getHeuristic();
+			bestNode = node;
+		}
+		currentMax = std::min(currentMax, currentValue);
+	}
+
+	if (currentMax <= currentMin)
+	{
+#ifdef TRACK
+		totalPrunning++;
+#endif
+		return true;
+	}
+
+	return false;
 }
 
 Node::Node(GameMemory memory):Node(memory, {-1,-1}, memory.getCurrentTurn() == GREEN,0)

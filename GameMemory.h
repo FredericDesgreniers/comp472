@@ -58,7 +58,7 @@ public:
 	GameMemory();
 
 	bool isPositionOnBoard(vec2 position);
-	TileType getTileAt(vec2 position);
+	TileType getTileAt(const vec2 &position);
 	void setTileAt(vec2 position, TileType type);
 
 	TileType* getTileArray()
@@ -73,11 +73,13 @@ public:
 	void generateTile(vec2 vec2);
 
 	MoveResult doMove(vec2 origin, vec2 destination);
+
 	MoveResult doMoveUnsafe(const vec2 &origin, const vec2 &destination);
 
 	bool isValidMove(vec2 origin, vec2 destination);
 
 	void getKillsInDirection(const vec2 origin, const vec2 direction, std::vector<vec2> &killList);
+
 	std::vector<vec2> getKillsInDirection(const vec2 origin, const vec2 direction);
 
 	void nextTurn();

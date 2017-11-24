@@ -3,9 +3,9 @@
 
 #include "GameMemory.h"
 #include <memory>
-#define maxDepth 7
+#define maxDepth 6
 
-//#define TRACK
+#define TRACK
 
 struct MoveInfo
 {
@@ -35,6 +35,8 @@ class Node
 
 	void calculateHeuristic();
 	void  findBestNode(int currentMin, int currentMax);
+	
+	bool evaluateForBestNode(const std::shared_ptr<Node>&, std::shared_ptr<Node>&, int &currentValue, int &currentMin, int &currentMax);
 
 	int depth;
 
@@ -45,7 +47,7 @@ public:
 	static int totalPrunning;
 	static int totalNodes;
 
-	Node(GameMemory memory, MoveInfo moveInfo, bool isMax, int depth);
+	Node(GameMemory& memory, MoveInfo moveInfo, bool isMax, int depth);
 
 	Node(GameMemory memory);
 
