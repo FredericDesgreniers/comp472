@@ -75,7 +75,8 @@ void Node::findBestNode(int currentMin, int currentMax)
 	};
 
 	std::vector<std::shared_ptr<Node>> container;
-	container.reserve(tokenList.size()*2);
+
+	container.reserve(tokenList.size()*8);
 
 	std::priority_queue<std::shared_ptr<Node>, std::vector<std::shared_ptr<Node>>, decltype(cmp)> childNodes(cmp, std::move(container));
 
@@ -103,8 +104,9 @@ void Node::findBestNode(int currentMin, int currentMax)
 		}
 	}
 
+
 	std::shared_ptr<Node> bestNode;
-	if (depth > 2)
+	if (depth > 0)
 	{
 		while(!childNodes.empty()){
 
@@ -124,39 +126,41 @@ void Node::findBestNode(int currentMin, int currentMax)
 	}
 	else
 	{
-		while (!childNodes.empty()) {
-			int threadNum = 2;
-			std::vector<std::shared_ptr<Node>> nodes;
-			nodes.reserve(threadNum);
-			std::vector<std::future<void>> nodeFutures;
-			nodeFutures.reserve(threadNum);
+		while (!childNodes.empty())
+		{
+			auto node1 = childNodes.top();
+			childNodes.pop();
+			auto future1 = std::async(std::launch::async, &Node::evaluate, node1.get(), currentMin, currentMax);
 
-			for (int i = 0; i < threadNum; i++)
-			{
-				if (!childNodes.empty())
-				{
-					std::shared_ptr<Node> node = childNodes.top();
-					childNodes.pop();
-					nodes.push_back(node);
-					nodeFutures.push_back(std::async(std::launch::async, &Node::evaluate, node.get(), currentMin, currentMax));
-				}
+			bool has2 = !childNodes.empty();
 
-			}
+			if (has2) {
+				auto node2 = childNodes.top();
+				childNodes.pop();
+				auto future2 = std::async(std::launch::async, &Node::evaluate, node2.get(), currentMin, currentMax);
 
-			int currentNode = 0;
-			for (auto &f : nodeFutures)
-			{
-				f.wait();
-				if (evaluateForBestNode(nodes.at(currentNode++), bestNode, currentValue, currentMin, currentMax))
+				future2.wait();
+
+				if (evaluateForBestNode(node2, bestNode, currentValue, currentMin, currentMax))
 				{
 					heuristic = bestNode->getHeuristic();
 					bestMove = MoveInfo(bestNode->getMove());
 
 					return;
 				}
-
 			}
 
+			future1.wait();
+
+			if (evaluateForBestNode(node1, bestNode, currentValue, currentMin, currentMax))
+			{
+				heuristic = bestNode->getHeuristic();
+				bestMove = MoveInfo(bestNode->getMove());
+
+				return;
+			}
+
+			
 		}
 	}
 	heuristic = bestNode->getHeuristic();
