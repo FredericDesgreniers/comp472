@@ -249,8 +249,15 @@ void GameMemory::doAiMove()
 	Node::totalPrunning = 0;
 	Node::totalNodes = 0;
 
-	Node node(*this);
+	Node node(*this, 7);
 	node.evaluate(INT_MIN, INT_MAX);
+	// stop timer
+	QueryPerformanceCounter(&t2);
+
+	// compute and print the elapsed time in millisec
+	elapsedTime = (t2.QuadPart - t1.QuadPart) * 1000.0 / frequency.QuadPart;
+	std::cout << "Time for move: " << elapsedTime / 1000 << "s" << std::endl;
+
 
 	std::cout << "Nodes: " << Node::totalNodes << std::endl;
 	std::cout << "Evaluates: " << Node::totalEvaluates << std::endl;
@@ -262,12 +269,7 @@ void GameMemory::doAiMove()
 	std::cout << "Moving from " << bestMove.source.getBoardCoordinates() << ", " << bestMove.destination.getBoardCoordinates() << std::endl;
 	std::cout << "h: " << node.getHeuristic() << std::endl;
 
-	// stop timer
-	QueryPerformanceCounter(&t2);
-
-	// compute and print the elapsed time in millisec
-	elapsedTime = (t2.QuadPart - t1.QuadPart) * 1000.0 / frequency.QuadPart;
-	std::cout << "Time for move: " << elapsedTime/1000 << "s" << std::endl;
+	
 
 	nextTurn();
 }

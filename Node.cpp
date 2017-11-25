@@ -12,17 +12,28 @@ int Node::totalNodes = 0;
 int Node::totalEvaluates = 0;
 int Node::totalPrunning = 0;
 
-Node::Node(GameMemory& memory, MoveInfo moveInfo, bool isMax, int depth): memory(memory)
-		, moveInfo(moveInfo), isMax(isMax), depth(depth)
+Node::Node(GameMemory& memory, MoveInfo moveInfo, bool isMax, int depth, int maxDepth): memory(memory)
+		, moveInfo(moveInfo), isMax(isMax), depth(depth), maxDepth(maxDepth)
 {
+
+
 	if(moveInfo.source.x >= 0)
 	{
-		this->memory.doMoveUnsafe(moveInfo.source, moveInfo.destination);
+		auto moveResult = this->memory.doMoveUnsafe(moveInfo.source, moveInfo.destination);
+
+		simpleHeuristic = memory.getGreenPositions().size() - memory.getRedPositions().size();
+
+		float percentOccupied = float(memory.getGreenPositions().size() + memory.getRedPositions().size()) / float(9 * 5);
+		
+		if (percentOccupied > 0.2 && percentOccupied < 0.8)
+		{
+			this->maxDepth= 6;
+		}
 	}
 #ifdef TRACK
 	totalNodes++;
 #endif
-	simpleHeuristic = memory.getGreenPositions().size() - memory.getRedPositions().size();
+	
 }
 
 void Node::evaluate(int currentMin, int currentMax)
@@ -52,7 +63,11 @@ void Node::evaluate(int currentMin, int currentMax)
 
 void Node::calculateHeuristic()
 {
-	heuristic = memory.getGreenPositions().size() - memory.getRedPositions().size();
+	int greenSize = memory.getGreenPositions().size();
+	int redSize = memory.getRedPositions().size();
+
+	heuristic = greenSize * greenSize - redSize*redSize;
+	//heuristic = memory.getGreenPositions().size() - memory.getRedPositions().size();
 
 }
 
@@ -97,7 +112,7 @@ void Node::findBestNode(int currentMin, int currentMax)
 
 					if (memory.isValidMove(position, destination))
 					{
-						childNodes.push(std::make_shared<Node>(memory, MoveInfo(position, destination), !isMax, depth + 1));
+						childNodes.push(std::make_shared<Node>(memory, MoveInfo(position, destination), !isMax, depth + 1, maxDepth));
 					}
 				}
 			}
@@ -201,8 +216,8 @@ bool Node::evaluateForBestNode(const std::shared_ptr<Node>& node, std::shared_pt
 	return false;
 }
 
-Node::Node(GameMemory memory):Node(memory, {-1,-1}, memory.getCurrentTurn() == GREEN,0)
+Node::Node(GameMemory memory, int maxDepth):Node(memory, {-1,-1}, memory.getCurrentTurn() == GREEN,0, maxDepth)
 {
-	std::cout << "Finding for " << (isMax?"MAX":"MIN") << std::endl;
+
 }
 

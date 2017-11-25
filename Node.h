@@ -3,7 +3,6 @@
 
 #include "GameMemory.h"
 #include <memory>
-#define maxDepth 6
 
 #define TRACK
 
@@ -31,7 +30,7 @@ class Node
 	MoveInfo moveInfo;
 	MoveInfo bestMove = {0, 0};
 	
-
+	int maxDepth;
 
 	void calculateHeuristic();
 	void  findBestNode(int currentMin, int currentMax);
@@ -47,9 +46,9 @@ public:
 	static int totalPrunning;
 	static int totalNodes;
 
-	Node(GameMemory& memory, MoveInfo moveInfo, bool isMax, int depth);
+	Node(GameMemory& memory, MoveInfo moveInfo, bool isMax, int depth, int maxDepth);
 
-	Node(GameMemory memory);
+	Node(GameMemory memory, int maxDepth);
 
 	int getHeuristic()
 	{
