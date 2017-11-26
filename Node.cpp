@@ -23,11 +23,13 @@ Node::Node(GameMemory& memory, MoveInfo moveInfo, bool isMax, int depth, int max
 
 		simpleHeuristic = memory.getGreenPositions().size() - memory.getRedPositions().size();
 
-		float percentOccupied = float(memory.getGreenPositions().size() + memory.getRedPositions().size()) / float(9 * 5);
-		
-		if (percentOccupied > 0.2 && percentOccupied < 0.8)
-		{
-			this->maxDepth= 6;
+		if (depth <= 3) {
+			float percentOccupied = float(memory.getGreenPositions().size() + memory.getRedPositions().size()) / float(9 * 5);
+
+			if (percentOccupied > 0.2 && percentOccupied < 0.8)
+			{
+				this->maxDepth = 6;
+			}
 		}
 	}
 #ifdef TRACK
@@ -66,7 +68,7 @@ void Node::calculateHeuristic()
 	int greenSize = memory.getGreenPositions().size();
 	int redSize = memory.getRedPositions().size();
 
-	heuristic = greenSize * greenSize - redSize*redSize;
+	heuristic = greenSize - redSize;
 	//heuristic = memory.getGreenPositions().size() - memory.getRedPositions().size();
 
 }
