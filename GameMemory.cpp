@@ -7,7 +7,9 @@
 #include <windows.h>
 #include <profileapi.h>
 
-GameMemory::GameMemory(): playerType()
+TileType GameMemory::playerType = INVALID;
+
+GameMemory::GameMemory()
 {
 	memset(tiles, vec2{9, 5}.getArea(), 1);
 
@@ -103,7 +105,7 @@ MoveResult GameMemory::doMove(vec2 origin, vec2 destination)
 {
 	if (!isValidMove(origin, destination))
 	{
-		return { false,{} };
+		return { false};
 	}
 
 	return doMoveUnsafe(origin, destination);
@@ -144,7 +146,7 @@ MoveResult GameMemory::doMoveUnsafe(const vec2 &origin, const vec2 &destination)
 	setTileAt(destination, originTile);
 	setTileAt(origin, EMPTY);
 
-	return { true, killList };
+	return { true };
 }
 
 bool GameMemory::isValidMove(vec2 origin, vec2 destination)

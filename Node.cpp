@@ -8,12 +8,12 @@
 #include <queue>
 #include <future>
 
-int Node::totalNodes = 0;
-int Node::totalEvaluates = 0;
-int Node::totalPrunning = 0;
+unsigned int Node::totalNodes = 0;
+unsigned int Node::totalEvaluates = 0;
+unsigned int Node::totalPrunning = 0;
 
-Node::Node(GameMemory& memory, MoveInfo moveInfo, bool isMax, int depth, int maxDepth): memory(memory)
-		, moveInfo(moveInfo), isMax(isMax), depth(depth), maxDepth(maxDepth)
+Node::Node(GameMemory& memory, MoveInfo moveInfo, bool isMax, DepthInfo depthInfo): memory(memory)
+		, moveInfo(moveInfo), isMax(isMax), depthInfo(depthInfo)
 {
 
 
@@ -23,12 +23,12 @@ Node::Node(GameMemory& memory, MoveInfo moveInfo, bool isMax, int depth, int max
 
 		simpleHeuristic = memory.getGreenPositions().size() - memory.getRedPositions().size();
 
-		if (depth <= 3) {
+		if (depthInfo.depth <= 3) {
 			float percentOccupied = float(memory.getGreenPositions().size() + memory.getRedPositions().size()) / float(9 * 5);
 
 			if (percentOccupied > 0.2 && percentOccupied < 0.8)
 			{
-				this->maxDepth = 6;
+				this->depthInfo.maxDepth = 6;
 			}
 		}
 	}
@@ -44,19 +44,19 @@ void Node::evaluate(int currentMin, int currentMax)
 	totalEvaluates++;
 #endif
 
-	if (depth == maxDepth)
+	if (depthInfo.depth == depthInfo.maxDepth)
 	{
 		calculateHeuristic();
 	}
 	else if(memory.getGreenPositions().size() == 0)
 	{
-		heuristic = INT_MIN/depth;
+		heuristic = INT_MIN/ depthInfo.depth;
 	}
 	else if(memory.getRedPositions().size() == 0)
 	{
-		heuristic = INT_MAX/depth;
+		heuristic = INT_MAX/ depthInfo.depth;
 	}
-	else if (depth < maxDepth)
+	else if (depthInfo.depth < depthInfo.maxDepth)
 	{
 		findBestNode(currentMin, currentMax);
 	}
@@ -114,7 +114,7 @@ void Node::findBestNode(int currentMin, int currentMax)
 
 					if (memory.isValidMove(position, destination))
 					{
-						childNodes.push(std::make_shared<Node>(memory, MoveInfo(position, destination), !isMax, depth + 1, maxDepth));
+						childNodes.push(std::make_shared<Node>(memory, MoveInfo(position, destination), !isMax, DepthInfo{ depthInfo.depth + 1, depthInfo.maxDepth }));
 					}
 				}
 			}
@@ -123,7 +123,7 @@ void Node::findBestNode(int currentMin, int currentMax)
 
 
 	std::shared_ptr<Node> bestNode;
-	if (depth > 0)
+	if (depthInfo.depth > 0)
 	{
 		while(!childNodes.empty()){
 
@@ -218,7 +218,7 @@ bool Node::evaluateForBestNode(const std::shared_ptr<Node>& node, std::shared_pt
 	return false;
 }
 
-Node::Node(GameMemory memory, int maxDepth):Node(memory, {-1,-1}, memory.getCurrentTurn() == GREEN,0, maxDepth)
+Node::Node(GameMemory memory,unsigned int maxDepth):Node(memory, {-1,-1}, memory.getCurrentTurn() == GREEN, { 0, maxDepth })
 {
 
 }

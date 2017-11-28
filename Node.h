@@ -17,7 +17,10 @@ struct MoveInfo
 	}
 };
 
-
+struct DepthInfo {
+	unsigned int depth : 3;
+	unsigned int maxDepth : 3;
+};
 
 class Node
 {
@@ -30,25 +33,25 @@ class Node
 	MoveInfo moveInfo;
 	MoveInfo bestMove = {0, 0};
 	
-	int maxDepth;
+	
 
 	void calculateHeuristic();
 	void  findBestNode(int currentMin, int currentMax);
 	
 	bool evaluateForBestNode(const std::shared_ptr<Node>&, std::shared_ptr<Node>&, int &currentValue, int &currentMin, int &currentMax);
 
-	int depth;
+	DepthInfo depthInfo;
 
 	int simpleHeuristic;
 
 public:
-	static int totalEvaluates;
-	static int totalPrunning;
-	static int totalNodes;
+	static unsigned int totalEvaluates;
+	static unsigned int totalPrunning;
+	static unsigned int totalNodes;
 
-	Node(GameMemory& memory, MoveInfo moveInfo, bool isMax, int depth, int maxDepth);
+	Node(GameMemory& memory, MoveInfo moveInfo, bool isMax, DepthInfo depthInfo);
 
-	Node(GameMemory memory, int maxDepth);
+	Node(GameMemory memory, unsigned int maxDepth);
 
 	int getHeuristic()
 	{

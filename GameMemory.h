@@ -25,19 +25,15 @@ static bool isBlackReferenceBoard[5][9] =
 
 class MoveResult
 {
-	std::vector<vec2> killList;
 	bool valid;
 
 public:
-	MoveResult(bool valid, std::vector<vec2> killList): valid(valid), killList(killList)
+	MoveResult(bool valid): valid(valid)
 	{
 
 	}
 
-	std::vector<vec2> getKillList() const
-	{
-		return killList;
-	}
+
 
 	bool isValid() const
 	{
@@ -51,11 +47,13 @@ class GameMemory
 	TileType currentTurn = GREEN;
 	std::vector<vec2> greenPositions;
 	std::vector<vec2> redPositions;
-	TileType playerType;
-	int turnsWithoutAttack = 0;
+	
+	unsigned int turnsWithoutAttack = 0;
 
 public:
 	GameMemory();
+
+	static TileType playerType;
 
 	bool isPositionOnBoard(vec2 position);
 	TileType getTileAt(const vec2 &position);
@@ -97,11 +95,6 @@ public:
 	const std::vector<vec2> &getRedPositions()
 	{
 		return redPositions;
-	}
-
-	void setPlayerType(TileType playerType)
-	{
-		this->playerType = playerType;
 	}
 
 	TileType getPlayerType()
