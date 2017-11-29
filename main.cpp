@@ -51,13 +51,13 @@ int DisplayConfirmChooseColorAsMessageBox()
 	if (msgboxID == IDYES)
 	{
 		MessageBox(NULL, "You are now Green", "Starting Color", MB_ICONINFORMATION | MB_OK);
-		memory.playerType = GREEN;
+		memory.setPlayerType(GREEN);
 		// TODO: add code
 	}
 	else if (msgboxID == IDNO)
 	{
 		MessageBox(NULL, "You are now Red", "Starting Color", MB_ICONINFORMATION | MB_OK);
-		memory.playerType = GREEN;
+		memory.setPlayerType(RED);
 	}
 
 	return msgboxID;

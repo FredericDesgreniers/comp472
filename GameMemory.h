@@ -2,6 +2,7 @@
 
 #include <vector>
 #include "vec2.h"
+
 #define BOARD_WIDTH 9
 #define BOARD_HEIGHT 5
 
@@ -100,6 +101,11 @@ public:
 	TileType getPlayerType()
 	{
 		return playerType;
+	}
+
+	void setPlayerType(TileType pType)
+	{
+		playerType = pType;
 	}
 
 	std::vector<vec2>& getCurrentTurnTokenList();

@@ -28,14 +28,123 @@ Node::Node(GameMemory& memory, MoveInfo moveInfo, bool isMax, DepthInfo depthInf
 
 			if (percentOccupied > 0.2 && percentOccupied < 0.8)
 			{
-				this->depthInfo.maxDepth = 6;
+				this->depthInfo.maxDepth = 4;
 			}
 		}
+
 	}
 #ifdef TRACK
 	totalNodes++;
 #endif
 	
+}
+
+int Node::evaluateHeuristic(const vec2& position, const vec2& direction)
+{
+
+	auto nextPosition = position + direction;
+	auto nextTile = memory.getTileAt(nextPosition);
+	auto secondNextTile = memory.getTileAt(nextPosition + direction);
+	auto behindTile = memory.getTileAt(position - direction);
+	auto sourceTile = memory.getTileAt(position);
+
+	auto enemyTile = getOpposite(sourceTile);
+
+	if (nextTile == INVALID)
+	{
+		return 0;
+	}
+	else
+	{
+		if (nextTile == sourceTile)
+		{
+			if (secondNextTile == sourceTile)
+			{
+				return -5;
+			}
+			return -2;
+		}
+		else if (nextTile == EMPTY)
+		{
+			if(secondNextTile == enemyTile || behindTile == enemyTile)
+			{
+				if(isMax)
+				{
+					if(sourceTile == GREEN)
+					{
+						return 5;
+					}
+					else //RED
+					{
+						return -5;
+					}
+				}
+				else
+				{
+					if (sourceTile == GREEN)
+					{
+						return -5;
+					}
+					else //RED
+					{
+						return 5;
+					}
+				}
+			}
+		}
+		else if(nextTile == enemyTile)
+		{
+			if(isMax)
+			{
+				if(sourceTile == GREEN)
+				{
+					if (behindTile == EMPTY)
+					{
+						return 5;
+					}
+					else
+					{
+						return 0;
+					}
+				}
+				else //RED
+				{
+					if(secondNextTile == EMPTY)
+					{
+						return 5;
+					}
+				}
+				
+			}
+			else
+			{
+				if(sourceTile == GREEN)
+				{
+					if(secondNextTile == EMPTY)
+					{
+						return -5;
+					}
+					else
+					{
+						return 0;
+					}
+				}
+				else // RED
+				{
+					if(behindTile == EMPTY)
+					{
+						return -5;
+					}
+					else
+					{
+						return 0;
+					}
+				}
+			}
+		}
+	}
+
+	return 0;
 }
 
 void Node::evaluate(int currentMin, int currentMax)
@@ -44,32 +153,72 @@ void Node::evaluate(int currentMin, int currentMax)
 	totalEvaluates++;
 #endif
 
+
 	if (depthInfo.depth == depthInfo.maxDepth)
 	{
 		calculateHeuristic();
 	}
-	else if(memory.getGreenPositions().size() == 0)
+	if (memory.getGreenPositions().size() == 0)
 	{
-		heuristic = INT_MIN/ depthInfo.depth;
+		this->depthInfo.depth = this->depthInfo.maxDepth;
+		heuristic = INT_MIN / depthInfo.depth;
 	}
-	else if(memory.getRedPositions().size() == 0)
+	else if (memory.getRedPositions().size() == 0)
 	{
-		heuristic = INT_MAX/ depthInfo.depth;
-	}
-	else if (depthInfo.depth < depthInfo.maxDepth)
+		this->depthInfo.depth = this->depthInfo.maxDepth;
+		heuristic = INT_MAX / depthInfo.depth;
+	}else
+	if (depthInfo.depth < depthInfo.maxDepth)
 	{
 		findBestNode(currentMin, currentMax);
 	}
 }
 
 
+
 void Node::calculateHeuristic()
 {
-	int greenSize = memory.getGreenPositions().size();
-	int redSize = memory.getRedPositions().size();
+	heuristic = 0;
 
-	heuristic = greenSize - redSize;
-	//heuristic = memory.getGreenPositions().size() - memory.getRedPositions().size();
+	for(auto &tile : memory.getGreenPositions())
+	{
+		int tileHeuristic = 100;
+
+		tileHeuristic += evaluateHeuristic(tile, vec2{ -1, 0 });
+		tileHeuristic += evaluateHeuristic(tile, vec2{ 1, 0 });
+		tileHeuristic += evaluateHeuristic(tile, vec2{ 0, -1 });
+		tileHeuristic += evaluateHeuristic(tile, vec2{ 0, 1 });
+
+		if(isBlackReferenceBoard[tile.y][tile.x])
+		{
+			tileHeuristic += evaluateHeuristic(tile, vec2{ -1, -1 });
+			tileHeuristic += evaluateHeuristic(tile, vec2{ -1, 1 });
+			tileHeuristic += evaluateHeuristic(tile, vec2{ 1, -1 });
+			tileHeuristic += evaluateHeuristic(tile, vec2{ 1, 1 });
+		}
+
+		heuristic += tileHeuristic;
+	}
+
+	for (auto &tile : memory.getRedPositions())
+	{
+		int tileHeuristic = -100;
+
+		tileHeuristic += evaluateHeuristic(tile, vec2{ -1, 0 });
+		tileHeuristic += evaluateHeuristic(tile, vec2{ 1, 0 });
+		tileHeuristic += evaluateHeuristic(tile, vec2{ 0, -1 });
+		tileHeuristic += evaluateHeuristic(tile, vec2{ 0, 1 });
+
+		if (isBlackReferenceBoard[tile.y][tile.x])
+		{
+			tileHeuristic += evaluateHeuristic(tile, vec2{ -1, -1 });
+			tileHeuristic += evaluateHeuristic(tile, vec2{ -1, 1 });
+			tileHeuristic += evaluateHeuristic(tile, vec2{ 1, -1 });
+			tileHeuristic += evaluateHeuristic(tile, vec2{ 1, 1 });
+		}
+
+		heuristic += tileHeuristic;
+	}
 
 }
 

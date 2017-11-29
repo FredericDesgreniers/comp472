@@ -58,6 +58,17 @@ public:
 		return heuristic;
 	}
 
+	TileType getOpposite(TileType &type)
+	{
+		if (type == INVALID) return INVALID;
+		if (type == RED) return RED;
+		if (type == GREEN) return GREEN;
+
+		return EMPTY;
+	}
+
+	int evaluateHeuristic(const vec2 &position, const vec2 &direction);
+
 	void evaluate(int currentMin, int currentMax);
 
 	MoveInfo getBestMove()
