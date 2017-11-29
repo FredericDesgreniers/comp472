@@ -28,7 +28,7 @@ Node::Node(GameMemory& memory, MoveInfo moveInfo, bool isMax, DepthInfo depthInf
 
 			if (percentOccupied > 0.2 && percentOccupied < 0.8)
 			{
-				this->depthInfo.maxDepth = 4;
+				this->depthInfo.maxDepth = 6;
 			}
 		}
 
