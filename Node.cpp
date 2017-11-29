@@ -60,7 +60,7 @@ int Node::evaluateHeuristic(const vec2& position, const vec2& direction)
 		{
 			if (secondNextTile == sourceTile)
 			{
-				return -15;
+				return -20;
 			}
 			return -10;
 		}
@@ -72,22 +72,22 @@ int Node::evaluateHeuristic(const vec2& position, const vec2& direction)
 				{
 					if(sourceTile == GREEN)
 					{
-						return 5;
+						return 10;
 					}
 					else //RED
 					{
-						return -5;
+						return -10;
 					}
 				}
 				else
 				{
 					if (sourceTile == GREEN)
 					{
-						return -5;
+						return -10;
 					}
 					else //RED
 					{
-						return 5;
+						return 10;
 					}
 				}
 			}
@@ -173,7 +173,7 @@ void Node::calculateHeuristic()
 
 	for(auto &tile : memory.getGreenPositions())
 	{
-		int tileHeuristic = 100;
+		int tileHeuristic = 105;
 
 		tileHeuristic += evaluateHeuristic(tile, vec2{ -1, 0 });
 		tileHeuristic += evaluateHeuristic(tile, vec2{ 1, 0 });
@@ -193,7 +193,7 @@ void Node::calculateHeuristic()
 
 	for (auto &tile : memory.getRedPositions())
 	{
-		int tileHeuristic = -100;
+		int tileHeuristic = -105;
 
 		tileHeuristic += evaluateHeuristic(tile, vec2{ -1, 0 });
 		tileHeuristic += evaluateHeuristic(tile, vec2{ 1, 0 });
