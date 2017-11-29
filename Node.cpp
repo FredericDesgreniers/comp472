@@ -154,20 +154,11 @@ void Node::evaluate(int currentMin, int currentMax)
 #endif
 
 
-	if (depthInfo.depth == depthInfo.maxDepth)
+	if (depthInfo.depth >= depthInfo.maxDepth)
 	{
 		calculateHeuristic();
 	}
-	if (memory.getGreenPositions().size() == 0)
-	{
-		this->depthInfo.depth = this->depthInfo.maxDepth;
-		heuristic = INT_MIN / depthInfo.depth;
-	}
-	else if (memory.getRedPositions().size() == 0)
-	{
-		this->depthInfo.depth = this->depthInfo.maxDepth;
-		heuristic = INT_MAX / depthInfo.depth;
-	}else
+
 	if (depthInfo.depth < depthInfo.maxDepth)
 	{
 		findBestNode(currentMin, currentMax);
