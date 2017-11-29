@@ -28,7 +28,7 @@ Node::Node(GameMemory& memory, MoveInfo moveInfo, bool isMax, DepthInfo depthInf
 
 			if (percentOccupied > 0.2 && percentOccupied < 0.8)
 			{
-				this->depthInfo.maxDepth = 6;
+				this->depthInfo.maxDepth = 5;
 			}
 		}
 
@@ -60,9 +60,9 @@ int Node::evaluateHeuristic(const vec2& position, const vec2& direction)
 		{
 			if (secondNextTile == sourceTile)
 			{
-				return -5;
+				return -15;
 			}
-			return -2;
+			return -10;
 		}
 		else if (nextTile == EMPTY)
 		{
