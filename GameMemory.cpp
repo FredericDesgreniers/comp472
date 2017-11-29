@@ -251,7 +251,7 @@ void GameMemory::doAiMove()
 	Node::totalPrunning = 0;
 	Node::totalNodes = 0;
 
-	Node node(*this, 6);
+	Node node(*this, 5);
 	node.evaluate(INT_MIN, INT_MAX);
 	// stop timer
 	QueryPerformanceCounter(&t2);
