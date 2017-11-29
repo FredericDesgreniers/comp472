@@ -171,6 +171,7 @@ void Node::calculateHeuristic()
 {
 	heuristic = 0;
 
+
 	for(auto &tile : memory.getGreenPositions())
 	{
 		int tileHeuristic = 105;

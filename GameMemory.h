@@ -108,6 +108,11 @@ public:
 		playerType = pType;
 	}
 
+	unsigned int getTurnsWithoutAttack()
+	{
+		return turnsWithoutAttack;
+	}
+
 	std::vector<vec2>& getCurrentTurnTokenList();
 };
 
